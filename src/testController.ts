@@ -184,7 +184,7 @@ export function createTestController(
         const result = await testCommands.runTestCommand(
           item.id,
           item.children.size == 0,
-          false,
+          debug,
           excludeFilters
         )
         if (result) await addTestResults(run, result)
