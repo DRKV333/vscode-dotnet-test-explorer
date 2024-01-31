@@ -51,7 +51,7 @@
     "commands": [
       {
         "command": "dotnet-test-explorer.showLog",
-        "title": "Show log",
+        "title": ".NET Test Explorer: Show log",
         "icon": {
           "light": "resources/light/log.svg",
           "dark": "resources/dark/log.svg"
@@ -59,7 +59,7 @@
       },
       {
         "command": "dotnet-test-explorer.stop",
-        "title": "Stop running processes",
+        "title": ".NET Test Explorer: Stop running processes",
         "icon": {
           "light": "resources/light/stop.svg",
           "dark": "resources/dark/stop.svg"
@@ -67,7 +67,7 @@
       },
       {
         "command": "dotnet-test-explorer.refreshTestExplorer",
-        "title": "Refresh",
+        "title": ".NET Test Explorer: Refresh",
         "icon": {
           "light": "resources/light/refresh.svg",
           "dark": "resources/dark/refresh.svg"
@@ -75,7 +75,7 @@
       },
       {
         "command": "dotnet-test-explorer.runAllTests",
-        "title": "Run All Tests",
+        "title": ".NET Test Explorer: Run All Tests",
         "icon": {
           "light": "resources/light/run.png",
           "dark": "resources/dark/run.png"
@@ -83,7 +83,7 @@
       },
       {
         "command": "dotnet-test-explorer.runTest",
-        "title": "Run Test",
+        "title": ".NET Test Explorer: Run Test",
         "icon": {
           "light": "resources/light/run.svg",
           "dark": "resources/dark/run.svg"
@@ -91,11 +91,11 @@
       },
       {
         "command": "dotnet-test-explorer.runTestInContext",
-        "title": "Run .NET Core Test in context"
+        "title": ".NET Test Explorer: Run Test in context"
       },
       {
         "command": "dotnet-test-explorer.gotoTest",
-        "title": "Go to Test",
+        "title": ".NET Test Explorer: Go to Test",
         "icon": {
           "light": "resources/light/gototest.svg",
           "dark": "resources/dark/gototest.svg"
@@ -103,11 +103,11 @@
       },
       {
         "command": "dotnet-test-explorer.debugTest",
-        "title": "Debug Test"
+        "title": ".NET Test Explorer: Debug Test"
       },
       {
         "command": "dotnet-test-explorer.openPanel",
-        "title": "Open Tests Panel"
+        "title": ".NET Test Explorer: Open Tests Panel"
       }
     ],
     "menus": {
