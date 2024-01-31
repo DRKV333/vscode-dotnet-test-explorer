@@ -36,6 +36,7 @@ export class Watch {
             return;
         }
 
+        this.watchedDirectories.push(testDirectory);
         Logger.Log("Starting watch for " + testDirectory);
 
         const trxPath = path.join(this.testCommands.testResultFolder, `autoWatch${index}.trx`);
