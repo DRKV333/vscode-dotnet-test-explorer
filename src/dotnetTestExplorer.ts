@@ -103,22 +103,9 @@ export class DotnetTestExplorer implements TreeDataProvider<TestNode> {
         }
 
         this.testNodes = [];
-        const concreteRoot = this.createConcreteTree("", tree);
+        const concreteRoot = TestNode.fromAbstractTree("", tree, this.testResults, this.testNodes);
 
         return concreteRoot.children;
-    }
-
-    private createConcreteTree(parentNamespace: string, abstractTree: ITestTreeNode): TestNode {
-        const children = [];
-        for (const subNamespace of abstractTree.subTrees.values()) {
-            children.push(this.createConcreteTree(abstractTree.fullName, subNamespace));
-        }
-        for (const test of abstractTree.tests) {
-            const testNode = new TestNode(abstractTree.fullName, test, this.testResults);
-            this.testNodes.push(testNode);
-            children.push(testNode);
-        }
-        return new TestNode(parentNamespace, abstractTree.name, this.testResults, children);
     }
 
     // change to use settings

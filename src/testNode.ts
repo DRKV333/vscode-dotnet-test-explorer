@@ -1,3 +1,4 @@
+import { ITestTreeNode } from "./buildTree";
 import { TestResult } from "./testResult";
 import { Utility } from "./utility";
 
@@ -16,6 +17,20 @@ export class TestNode {
     private _isLoading: boolean;
     private _icon: string;
     private _fqn: string;
+
+    public static fromAbstractTree(parentNamespace: string, abstractTree: ITestTreeNode, testResults: TestResult[], allNodes?: TestNode[]): TestNode {
+        const children = [];
+        for (const subNamespace of abstractTree.subTrees.values()) {
+            children.push(TestNode.fromAbstractTree(abstractTree.fullName, subNamespace, testResults, allNodes));
+        }
+        for (const test of abstractTree.tests) {
+            const testNode = new TestNode(abstractTree.fullName, test, testResults);
+            if (allNodes)
+                allNodes.push(testNode);
+            children.push(testNode);
+        }
+        return new TestNode(parentNamespace, abstractTree.name, testResults, children);
+    }
 
     constructor(private _parentNamespace: string, private _name: string, testResults: TestResult[], private _children?: TestNode[]) {
         this.setIconFromTestResult(testResults);
