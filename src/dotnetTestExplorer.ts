@@ -166,7 +166,7 @@ export class DotnetTestExplorer implements TreeDataProvider<TestNode> {
             }
         }
 
-        this.discoveredTests = this.discoveredTests.sort();
+        this.discoveredTests.sort();
 
         this.statusBar.discovered(this.discoveredTests.length);
 
