@@ -51,18 +51,20 @@ export class Utility {
 
         return testName
             .split(/\.(?![^\(]*\))/g) // Split on all . that are not in paranthesis
-            .map( (n) => {
-                let name = n;
-
-                const firstParanthesis = name.indexOf("(");
-
-                if (firstParanthesis > -1) {
-                    name = name.substring(0, firstParanthesis);
-                }
-
-                return name;
-            })
+            .map(Utility.trimArguments)
             .join(".");
+    }
+
+    public static trimArguments(testName: string): string {
+        // The symbols are reported on the form Method or Method(string, int) (in case of test cases etc).
+        // We are only interested in the method name, not its arguments
+        const firstParenthesis = testName.indexOf("(");
+
+        if (firstParenthesis > -1) {
+            testName = testName.substring(0, firstParenthesis);
+        }
+
+        return testName;
     }
 
     public static updateCache() {

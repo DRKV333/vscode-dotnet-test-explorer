@@ -2,6 +2,7 @@ import * as assert from "assert";
 import * as vscode from "vscode";
 import { GotoTest } from "../src/gotoTest";
 import { TestNode } from "../src/testNode";
+import { Utility } from "../src/utility";
 
 suite("Find test location", () => {
 
@@ -140,16 +141,14 @@ suite("Get test method name", () => {
 
     test("Test name without namespace", () => {
 
-        const gotoTest = new GotoTest();
-        const result = gotoTest.getTestMethodFqn("Test");
+        const result = Utility.trimArguments("Test");
 
         assert.equal(result, "Test");
     });
 
     test("XUnit theory name without namespace", () => {
 
-        const gotoTest = new GotoTest();
-        const result = gotoTest.getTestMethodFqn("Test(param: value)");
+        const result = Utility.trimArguments("Test(param: value)");
 
         assert.equal(result, "Test");
     });
