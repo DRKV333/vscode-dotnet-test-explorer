@@ -64,7 +64,7 @@ export function createTestController(
 
         // have original tree for original explorer
         async function generateItemFromNode(tree: TestNode): Promise<vscode.TestItem> {
-            const symbol = await gotoTest.info(tree);
+            const symbol = tree.isFolder ? null : await gotoTest.info(tree);
             const treeNode = controller.createTestItem(tree.fullName, tree.name, symbol?.uri);
             treeNode.range = symbol?.range;
             if (tree.children) {
