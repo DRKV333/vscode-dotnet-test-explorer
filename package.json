@@ -276,6 +276,11 @@
             "Show both"
           ],
           "description": "Choose which test browser to use."
+        },
+        "dotnet-test-explorer.startupSymbolPollingTimeout" : {
+          "type": "number",
+          "default": 60,
+          "description": "How long to wait, in seconds, for symbols to become available during initial test discovery."
         }
       }
     },

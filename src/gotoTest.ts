@@ -4,18 +4,50 @@ import { TestNode } from "./testNode";
 import { Utility } from "./utility";
 
 export class GotoTest {
-    private async doGetLocation(test: TestNode): Promise<vscode.Location> {
-        const symbols = await vscode.commands.executeCommand<vscode.SymbolInformation[]>(
-            "vscode.executeWorkspaceSymbolProvider",
-            test.fqn,
-        );
+    private firstTry = true;
+
+    private async doGetLocation(test: TestNode, retry: boolean): Promise<vscode.Location> {
+        const attemptRetry = retry && this.firstTry;
+        
+        let symbols: vscode.SymbolInformation[] = null;
+        let startTime = -1;
+        let timeout = 0;
+
+        while (true) {
+            symbols = await vscode.commands.executeCommand<vscode.SymbolInformation[]>(
+                "vscode.executeWorkspaceSymbolProvider",
+                test.fqn,
+            );
+
+            if (symbols?.length > 0 || !attemptRetry)
+                break;
+
+            if (startTime == -1) {
+                startTime = Date.now();
+                timeout = Utility.getConfiguration().get<number>("startupSymbolPollingTimeout") * 1000;
+                if (timeout == 0)
+                    break;
+            }
+
+            if (Date.now() - startTime > timeout)
+                break;
+
+            Logger.Log("Waiting for symbols to become available...");
+            await this.sleep(1000);
+        }
+
+        if (attemptRetry || symbols?.length > 0)
+            this.firstTry = false;
+
+        if (attemptRetry && symbols?.length == 0)
+            throw Error("Waited for .NET test symbols, but they did not become available.");
 
         return this.findTestLocation(symbols, test).location;
     }
 
     public async info(test: TestNode): Promise<vscode.Location | null> {
         try {
-            return await this.doGetLocation(test);
+            return await this.doGetLocation(test, true);
         } catch (r) {
             Logger.Log(r.message);
         }
@@ -25,7 +57,7 @@ export class GotoTest {
 
     public async go(test: TestNode): Promise<void> {
         try {
-            const location = await this.doGetLocation(test);
+            const location = await this.doGetLocation(test, false);
 
             vscode.workspace.openTextDocument(location.uri).then((doc) => {
                 vscode.window.showTextDocument(doc).then((editor) => {
@@ -42,7 +74,7 @@ export class GotoTest {
     }
 
     public findTestLocation(symbols: vscode.SymbolInformation[], testNode: TestNode): vscode.SymbolInformation {
-        if (symbols.length === 0) {
+        if (!symbols || symbols.length === 0) {
             throw new Error(`Could not find test ${testNode.name} (no symbols found)`);
         }
 
@@ -65,5 +97,11 @@ export class GotoTest {
 
     private isSymbolATestCandidate(s: vscode.SymbolInformation): boolean {
         return s.location.uri.toString().endsWith(".fs") ? this.fsharpSymbolKinds.includes(s.kind) : s.kind === vscode.SymbolKind.Method;
+    }
+
+    private sleep(ms: number): Promise<void> {
+        return new Promise(resolve => {
+            setTimeout(resolve, ms);
+        })
     }
 }
