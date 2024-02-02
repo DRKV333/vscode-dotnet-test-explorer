@@ -14,7 +14,7 @@ export class Problems {
 
         const problems = [];
 
-        resultsWithStackTrace.forEach( (testResult) => {
+        resultsWithStackTrace.forEach((testResult) => {
             let m = Problems.regex.exec(testResult.stackTrace);
 
             const resultsWithLinks = [];

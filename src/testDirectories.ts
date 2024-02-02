@@ -19,7 +19,6 @@ export class TestDirectories {
         const matchingDirs = [];
 
         vscode.workspace.workspaceFolders.forEach((folder) => {
-
             const globPattern = folder.uri.fsPath.replace("\\", "/") + "/" + testDirectoryGlob;
 
             Logger.Log(`Finding projects for pattern ${globPattern}`);

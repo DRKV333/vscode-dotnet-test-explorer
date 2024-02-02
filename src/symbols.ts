@@ -17,7 +17,7 @@ export class Symbols {
                 const flattenedSymbols = Symbols.flatten(symbols, removeArgumentsFromMethods);
 
                 if (removeArgumentsFromMethods) {
-                    flattenedSymbols.map( (s) => s.documentSymbol).forEach( (s) => s.name = s.name.replace(/\(.*\)/g, ""));
+                    flattenedSymbols.map((s) => s.documentSymbol).forEach((s) => s.name = s.name.replace(/\(.*\)/g, ""));
                 }
 
                 return flattenedSymbols;
