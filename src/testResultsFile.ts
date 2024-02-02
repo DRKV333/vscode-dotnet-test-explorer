@@ -1,13 +1,13 @@
 "use strict";
 import * as fs from "fs";
-import { DOMParser, Element, Node } from "xmldom";
+import { DOMParser } from "xmldom";
 import { TestResult } from "./testResult";
 
-function findChildElement(node: Node, name: string): Node {
+function findChildElement(node: Element, name: string): Element {
     let child = node.firstChild;
     while (child) {
         if (child.nodeName === name) {
-            return child;
+            return child as Element;
         }
 
         child = child.nextSibling;
@@ -16,12 +16,12 @@ function findChildElement(node: Node, name: string): Node {
     return null;
 }
 
-function getAttributeValue(node: Node, name: string): string {
+function getAttributeValue(node: Element, name: string): string {
     const attribute = node.attributes.getNamedItem(name);
     return (attribute === null) ? null : attribute.nodeValue;
 }
 
-function getTextContentForTag(parentNode: Node, tagName: string): string {
+function getTextContentForTag(parentNode: Element, tagName: string): string {
     const node = parentNode.getElementsByTagName(tagName);
     return node.length > 0 ? node[0].textContent : "";
 }
@@ -87,6 +87,7 @@ function updateUnitTestDefinitions(xml: Element, results: TestResult[]): void {
         }
     }
 }
+
 export function parseResults(filePath: string): Promise<TestResult[]> {
     return new Promise((resolve, reject) => {
         let results: TestResult[];
