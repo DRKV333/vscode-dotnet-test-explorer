@@ -1,5 +1,5 @@
 "use strict";
-import { CancellationToken, CodeLens, CodeLensProvider, commands, Disposable, Event, EventEmitter, Range, SymbolInformation, SymbolKind, TextDocument } from "vscode";
+import { CancellationToken, CodeLens, CodeLensProvider, Disposable, Event, EventEmitter, SymbolKind, TextDocument } from "vscode";
 import { ITestSymbol, Symbols } from "./symbols";
 import { TestCommands } from "./testCommands";
 import { ITestResult, TestResult } from "./testResult";

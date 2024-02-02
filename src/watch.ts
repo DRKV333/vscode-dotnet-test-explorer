@@ -1,5 +1,4 @@
 import * as path from "path";
-import * as vscode from "vscode";
 import { Executor } from "./executor";
 import { Logger } from "./logger";
 import { TestCommands } from "./testCommands";

@@ -1,5 +1,4 @@
 import * as vscode from "vscode";
-import { SymbolKind } from "vscode";
 import { ITestSymbol, Symbols } from "./symbols";
 import { ITestRunContext } from "./testCommands";
 

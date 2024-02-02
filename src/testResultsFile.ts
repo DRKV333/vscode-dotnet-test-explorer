@@ -1,6 +1,5 @@
 "use strict";
 import * as fs from "fs";
-import { Disposable } from "vscode";
 import { DOMParser, Element, Node } from "xmldom";
 import { TestResult } from "./testResult";
 

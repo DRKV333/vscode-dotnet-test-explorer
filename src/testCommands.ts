@@ -8,10 +8,9 @@ import { Logger } from "./logger";
 import { TestDirectories } from "./testDirectories";
 import { discoverTests, IDiscoverTestsResult } from "./testDiscovery";
 import { TestNode } from "./testNode";
-import { ITestResult, TestResult } from "./testResult";
+import { ITestResult } from "./testResult";
 import { parseResults } from "./testResultsFile";
 import { Utility } from "./utility";
-import * as argv from "minimist"
 
 export interface ITestRunContext {
     testName: string;

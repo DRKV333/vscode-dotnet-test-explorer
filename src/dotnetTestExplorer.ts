@@ -1,8 +1,7 @@
 import * as path from "path";
 import * as vscode from "vscode";
 import { TreeDataProvider, TreeItem } from "vscode";
-import { buildTree, ITestTreeNode, mergeSingleItemTrees } from "./buildTree";
-import { Logger } from "./logger";
+import { buildTree, mergeSingleItemTrees } from "./buildTree";
 import { parseTestName } from "./parseTestName";
 import { StatusBar } from "./statusBar";
 import { ITestRunContext, TestCommands } from "./testCommands";

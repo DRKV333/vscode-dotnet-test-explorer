@@ -1,13 +1,13 @@
-import * as vscode from "vscode"
-import { Utility } from "./utility"
-import { parseTestName } from "./parseTestName"
-import { buildTree, ITestTreeNode, mergeSingleItemTrees } from "./buildTree"
-import { TestCommands } from "./testCommands"
-import { StatusBar } from "./statusBar"
-import { TestNode } from "./testNode"
-import { ITestResult } from "./testResult"
-import { Logger } from "./logger"
-import { GotoTest } from "./gotoTest"
+import * as vscode from "vscode";
+import { Utility } from "./utility";
+import { parseTestName } from "./parseTestName";
+import { buildTree, mergeSingleItemTrees } from "./buildTree";
+import { TestCommands } from "./testCommands";
+import { StatusBar } from "./statusBar";
+import { TestNode } from "./testNode";
+import { ITestResult } from "./testResult";
+import { Logger } from "./logger";
+import { GotoTest } from "./gotoTest";
 
 export interface TestControllerExtended extends vscode.TestController {
     discoveredTests: string[]
