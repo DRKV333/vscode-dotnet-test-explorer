@@ -18,7 +18,6 @@ import { Utility } from "./utility";
 import { Watch } from "./watch";
 
 export async function activate(context: vscode.ExtensionContext) {
-    
     Utility.updateCache();
 
     const testDirectories = new TestDirectories();

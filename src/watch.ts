@@ -7,12 +7,12 @@ import { parseResults } from "./testResultsFile";
 import { Utility } from "./utility";
 
 export class Watch {
-
     private watchedDirectories: string[] = [];
 
     constructor(
         private testCommands: TestCommands,
-        private testDirectories: TestDirectories) {
+        private testDirectories: TestDirectories
+    ) {
         // without original browser, there is nowhere for this to send test results to.
         if (Utility.useOriginalBrowser && Utility.getConfiguration().get<boolean>("autoWatch")) {
 
@@ -29,7 +29,6 @@ export class Watch {
     }
 
     private setupWatch(testDirectory: string, namespaceForDirectory: string, index: number) {
-
         if (this.watchedDirectories.some((wd) => wd === testDirectory)) {
             Logger.Log("Skipping adding watch since already watching directory " + testDirectory);
             return;

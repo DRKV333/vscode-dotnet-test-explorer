@@ -3,12 +3,8 @@ import { ITestSymbol, Symbols } from "./symbols";
 import { ITestRunContext } from "./testCommands";
 
 export class FindTestInContext {
-
     public async find(doc: vscode.TextDocument, position: vscode.Position): Promise<ITestRunContext> {
-
-
         return Symbols.getSymbols(doc.uri, true).then( (documentSymbols: ITestSymbol[]) => {
-
             const symbolsInRange = documentSymbols.filter( (ds) => ds.documentSymbol.range.contains(position));
 
             let symbolCandidate: ITestSymbol;

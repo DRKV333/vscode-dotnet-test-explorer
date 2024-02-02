@@ -6,12 +6,10 @@ import { Logger } from "./logger";
 import { Utility } from "./utility";
 
 export class TestDirectories {
-
     private directories: string[];
     private testsForDirectory: { dir: string, name: string }[];
 
     public parseTestDirectories() {
-
         if (!vscode.workspace || !vscode.workspace.workspaceFolders) {
             return;
         }
@@ -51,7 +49,6 @@ export class TestDirectories {
     }
 
     public getTestDirectories(testName?: string): string[] {
-
         if (testName && testName !== "") {
             const dirForTestName = this
                 .testsForDirectory
@@ -63,8 +60,8 @@ export class TestDirectories {
 
         return this.directories;
     }
-
 }
+
 function evaluateTestDirectories(testDirectories: string[]): string[] {
     const directories = [];
     const directoriesSet = new Set<string>();
@@ -75,7 +72,6 @@ function evaluateTestDirectories(testDirectories: string[]): string[] {
         if (!fs.existsSync(testProjectFullPath)) {
             Logger.LogWarning(`Path ${testProjectFullPath} is not valid`);
         } else {
-
             if (fs.lstatSync(testProjectFullPath).isFile()) {
                 testProjectFullPath = path.dirname(testProjectFullPath);
             }
@@ -89,5 +85,6 @@ function evaluateTestDirectories(testDirectories: string[]): string[] {
             }
         }
     }
+
     return directories;
 }

@@ -4,7 +4,6 @@ import { ITestResult, TestResult } from "./testResult";
 import { Utility } from "./utility";
 
 export class Problems {
-
     public static createProblemsFromResults(results: TestResult[]) {
         const resultsWithStackTrace = results
             .filter( (tr) => tr.stackTrace);
@@ -16,7 +15,6 @@ export class Problems {
         const problems = [];
 
         resultsWithStackTrace.forEach( (testResult) => {
-
             let m = Problems.regex.exec(testResult.stackTrace);
 
             const resultsWithLinks = [];
@@ -38,7 +36,7 @@ export class Problems {
             groups[val] = groups[val] || [];
             groups[val].push(new vscode.Diagnostic(new vscode.Range(item.lineNumber - 1, 0, item.lineNumber - 1, 10000), item.message));
             return groups;
-          }, {});
+        }, {});
     }
 
     private static regex = /in (.*):line (.*)/gm;
@@ -58,7 +56,6 @@ export class Problems {
     }
 
     private addTestResults(results: ITestResult) {
-
         this._diagnosticCollection.clear();
 
         const problems = Problems.createProblemsFromResults(results.testResults);

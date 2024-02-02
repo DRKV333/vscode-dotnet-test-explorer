@@ -4,7 +4,6 @@ import * as path from "path";
 import * as vscode from "vscode";
 
 export class Utility {
-
     public static skipBuild: boolean;
     public static runInParallel: boolean;
     public static useOriginalBrowser: boolean;

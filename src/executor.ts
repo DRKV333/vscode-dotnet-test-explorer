@@ -8,7 +8,6 @@ import { Logger } from "./logger";
 type ExecCallback = (error: ExecException | null, stdOut: string, stdErr: string) => void;
 
 export class Executor {
-
     public static runInTerminal(command: string, cwd?: string, addNewLine: boolean = true, terminal: string = ".NET Test Explorer"): void {
         if (this.terminals[terminal] === undefined) {
             this.terminals[terminal] = vscode.window.createTerminal(terminal);
@@ -29,7 +28,6 @@ export class Executor {
         const childProcess = exec(this.handleWindowsEncoding(command), { encoding: "utf8", maxBuffer: 5120000, cwd }, callback);
 
         if (addToProcessList) {
-
             Logger.Log(`Process ${childProcess.pid} started`);
 
             this.processes.push(childProcess);
@@ -63,13 +61,11 @@ export class Executor {
         const debug = new Debug();
 
         if (addToProcessList) {
-
             Logger.Log(`Process ${childProcess.pid} started`);
 
             this.processes.push(childProcess);
 
             childProcess.stdout.on("data", (buf) => {
-
                 if (this.debugRunnerInfo && this.debugRunnerInfo.isRunning) {
                     return;
                 }
@@ -81,7 +77,6 @@ export class Executor {
                 this.debugRunnerInfo = debug.onData(stdout, this.debugRunnerInfo);
 
                 if (this.debugRunnerInfo.config) {
-
                     Logger.Log(`Debugger process found, attaching`);
 
                     this.debugRunnerInfo.isRunning = true;
@@ -97,7 +92,6 @@ export class Executor {
             });
 
             childProcess.on("close", (code: number) => {
-
                 Logger.Log(`Debugger finished`);
 
                 this.debugRunnerInfo = null;

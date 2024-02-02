@@ -30,7 +30,8 @@ export class TestCommands implements Disposable {
     private isRunning: boolean;
 
     constructor(
-        private testDirectories: TestDirectories) { }
+        private testDirectories: TestDirectories
+    ) { }
 
     public dispose(): void {
         try {
@@ -154,7 +155,6 @@ export class TestCommands implements Disposable {
     }
 
     public async runTestCommand(testName: string, isSingleTest: boolean, debug?: boolean, exclusions?: string[]): Promise<any> {
-
         if (this.isRunning) {
             Logger.Log("Tests already running, ignore request to run tests for " + testName);
             return;
@@ -228,7 +228,6 @@ export class TestCommands implements Disposable {
 
     private runBuildCommandForSpecificDirectory(testDirectoryPath: string): Promise<void> {
         return new Promise((resolve, reject) => {
-
             if (Utility.skipBuild) {
                 Logger.Log(`User has passed --no-build, skipping build`);
                 resolve();
@@ -246,11 +245,9 @@ export class TestCommands implements Disposable {
     }
 
     private runTestCommandForSpecificDirectory(testDirectoryPath: string, testName: string, isSingleTest: boolean, index: number, debug: boolean, exclusions?: string[]): Promise<void> {
-
         const trxTestName = index + ".trx";
 
         return new Promise((resolve, reject) => {
-
             const filters: string[]  = []
             if (testName && testName.length) {
                 if (isSingleTest) {

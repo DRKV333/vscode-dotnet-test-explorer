@@ -101,7 +101,6 @@ export class TestNode {
             this._icon = this.isFolder ? TestNodeIcon.Namespace : TestNodeIcon.Run;
         } else {
             if (this.isFolder) {
-
                 const testsForFolder = testResults.filter((tr) => tr.fullName.startsWith(this.fullName));
 
                 if (testsForFolder.some((tr) => tr.outcome === "Failed")) {

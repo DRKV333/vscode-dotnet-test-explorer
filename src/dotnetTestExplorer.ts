@@ -11,7 +11,6 @@ import { ITestResult, TestResult } from "./testResult";
 import { Utility } from "./utility";
 
 export class DotnetTestExplorer implements TreeDataProvider<TestNode> {
-
     public _onDidChangeTreeData: vscode.EventEmitter<any> = new vscode.EventEmitter<any>();
     public readonly onDidChangeTreeData: vscode.Event<any> = this._onDidChangeTreeData.event;
 
@@ -70,7 +69,6 @@ export class DotnetTestExplorer implements TreeDataProvider<TestNode> {
     }
 
     public getChildren(element?: TestNode): TestNode[] | Thenable<TestNode[]> {
-
         if (element) {
             return element.children;
         }

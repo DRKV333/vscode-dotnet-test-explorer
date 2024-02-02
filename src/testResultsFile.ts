@@ -27,19 +27,19 @@ function getTextContentForTag(parentNode: Node, tagName: string): string {
 }
 
 function parseDuration(value: string) {
-  const parts = value.split(':')
-  if (parts.length !== 3) return undefined
-  let milliseconds = 0
-  //hours
-  milliseconds = milliseconds + parseInt(parts[0]) * 60 * 60 * 1000
+    const parts = value.split(':')
+    if (parts.length !== 3) return undefined
+    let milliseconds = 0
+    //hours
+    milliseconds = milliseconds + parseInt(parts[0]) * 60 * 60 * 1000
 
-  //minutes
-  milliseconds = milliseconds + parseInt(parts[1]) * 60 * 1000
+    //minutes
+    milliseconds = milliseconds + parseInt(parts[1]) * 60 * 1000
 
-  //seconds
-  milliseconds = milliseconds + parseFloat(parts[2]) * 1000
+    //seconds
+    milliseconds = milliseconds + parseFloat(parts[2]) * 1000
 
-  return milliseconds
+    return milliseconds
 }
 
 function parseUnitTestResults(xml: Element): TestResult[] {
@@ -50,14 +50,14 @@ function parseUnitTestResults(xml: Element): TestResult[] {
     for (let i = 0; i < nodes.length; i++) { // tslint:disable-line
 
         results.push(
-          new TestResult(
-            getAttributeValue(nodes[i], 'testId'),
-            getAttributeValue(nodes[i], 'outcome'),
-            getTextContentForTag(nodes[i], 'Message'),
-            getTextContentForTag(nodes[i], 'StackTrace'),
-            parseDuration(getAttributeValue(nodes[i], 'duration')),
-            nodes[i].toString()
-          )
+            new TestResult(
+                getAttributeValue(nodes[i], 'testId'),
+                getAttributeValue(nodes[i], 'outcome'),
+                getTextContentForTag(nodes[i], 'Message'),
+                getTextContentForTag(nodes[i], 'StackTrace'),
+                parseDuration(getAttributeValue(nodes[i], 'duration')),
+                nodes[i].toString()
+            )
         )
     }
 
@@ -88,7 +88,7 @@ function updateUnitTestDefinitions(xml: Element, results: TestResult[]): void {
     }
 }
 export function parseResults(filePath: string): Promise<TestResult[]> {
-    return new Promise( (resolve, reject) => {
+    return new Promise((resolve, reject) => {
         let results: TestResult[];
         fs.readFile(filePath, (err, data) => {
             if (!err) {
@@ -99,7 +99,7 @@ export function parseResults(filePath: string): Promise<TestResult[]> {
 
                 try {
                     fs.unlinkSync(filePath);
-                } catch {}
+                } catch { }
 
                 resolve(results);
             }

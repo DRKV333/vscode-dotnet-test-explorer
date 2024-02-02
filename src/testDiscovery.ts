@@ -14,7 +14,6 @@ export interface IDiscoverTestsResult {
 export function discoverTests(testDirectoryPath: string, dotnetTestOptions: string): Promise<IDiscoverTestsResult> {
     return executeDotnetTest(testDirectoryPath, dotnetTestOptions)
         .then((stdout) => {
-
             const testNames = extractTestNames(stdout);
             if (!isMissingFqNames(testNames)) {
                 return { testNames, folder: testDirectoryPath };
