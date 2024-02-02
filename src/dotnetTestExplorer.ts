@@ -14,8 +14,8 @@ export class DotnetTestExplorer implements TreeDataProvider<TestNode> {
     public _onDidChangeTreeData: vscode.EventEmitter<any> = new vscode.EventEmitter<any>();
     public readonly onDidChangeTreeData: vscode.Event<any> = this._onDidChangeTreeData.event;
 
-    private discoveredTests: string[];
-    private testResults: TestResult[];
+    private discoveredTests: string[] | null = null;
+    private testResults: TestResult[] | null = null;
     private testNodes: TestNode[] = [];
 
     constructor(private context: vscode.ExtensionContext, private testCommands: TestCommands, private statusBar: StatusBar) {
@@ -48,22 +48,27 @@ export class DotnetTestExplorer implements TreeDataProvider<TestNode> {
             element.name,
             element.isFolder
                 ? Utility.defaultCollapsibleState
-                : void 0
-            );
-        treeItem.iconPath = element.icon ? {
+                : undefined
+        );
+
+        treeItem.iconPath = {
             dark: this.context.asAbsolutePath(
                 path.join("resources", "dark", element.icon)
             ),
             light: this.context.asAbsolutePath(
                 path.join("resources", "light", element.icon)
-            ),
-        } : void 0,
-        treeItem.contextValue = element.isFolder ? "folder" : "test",
-        treeItem.command = element.isFolder ? null : {
-            command: "dotnet-test-explorer.leftClickTest",
-            title: "",
-            arguments: [element],
+            )
         };
+
+        treeItem.contextValue = element.isFolder ? "folder" : "test";
+
+        if (!element.isFolder) {
+            treeItem.command = {
+                command: "dotnet-test-explorer.leftClickTest",
+                title: "",
+                arguments: [element],
+            };
+        }
 
         return treeItem;
     }
@@ -87,9 +92,10 @@ export class DotnetTestExplorer implements TreeDataProvider<TestNode> {
         const treeMode = Utility.getConfiguration().get<string>("treeMode");
 
         if (treeMode === "flat") {
-            return this.testNodes = this.discoveredTests.map((name) => {
+            this.testNodes = this.discoveredTests.map((name) => {
                 return new TestNode("", name, this.testResults);
             });
+            return this.testNodes;
         }
 
         const parsedTestNames = this.discoveredTests.map(parseTestName);
@@ -114,7 +120,7 @@ export class DotnetTestExplorer implements TreeDataProvider<TestNode> {
     // change to use settings
     private updateWithDiscoveredTests(results: IDiscoverTestsResult[]) {
         this.testNodes = [];
-        this.discoveredTests = [].concat(...results.map((r) => r.testNames));
+        this.discoveredTests = results.flatMap((r) => r.testNames);
         this.statusBar.discovered(this.discoveredTests.length);
         this._onDidChangeTreeData.fire(null);
     }
@@ -149,14 +155,16 @@ export class DotnetTestExplorer implements TreeDataProvider<TestNode> {
     }
 
     private addTestResults(results: ITestResult) {
-
         const fullNamesForTestResults = results.testResults.map((r) => r.fullName);
 
         if (results.clearPreviousTestResults) {
             this.discoveredTests = [...fullNamesForTestResults];
             this.testResults = null;
         } else {
-            const newTests = fullNamesForTestResults.filter((r) => this.discoveredTests.indexOf(r) === -1);
+            if (!this.discoveredTests)
+                this.discoveredTests = [];
+
+            const newTests = fullNamesForTestResults.filter((r) => this.discoveredTests!.indexOf(r) === -1);
 
             if (newTests.length > 0) {
                 this.discoveredTests.push(...newTests);
@@ -169,12 +177,12 @@ export class DotnetTestExplorer implements TreeDataProvider<TestNode> {
 
         if (this.testResults) {
             results.testResults.forEach((newTestResult: TestResult) => {
-                const indexOldTestResult = this.testResults.findIndex((tr) => tr.fullName === newTestResult.fullName);
+                const indexOldTestResult = this.testResults!.findIndex((tr) => tr.fullName === newTestResult.fullName);
 
                 if (indexOldTestResult < 0) {
-                    this.testResults.push(newTestResult);
+                    this.testResults!.push(newTestResult);
                 } else {
-                    this.testResults[indexOldTestResult] = newTestResult;
+                    this.testResults![indexOldTestResult] = newTestResult;
                 }
             });
         } else {

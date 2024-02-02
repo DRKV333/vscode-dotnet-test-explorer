@@ -23,7 +23,7 @@ export class TestStatusCodeLensProvider implements CodeLensProvider {
 
     public dispose() {
         while (this.disposables.length) {
-            this.disposables.pop().dispose();
+            this.disposables.pop()!.dispose();
         }
     }
 
@@ -47,6 +47,9 @@ export class TestStatusCodeLensProvider implements CodeLensProvider {
         .then((symbols: ITestSymbol[]) => {
             const mapped: CodeLens[] = [];
             for (const symbol of symbols.filter((x) => symbolFilter(x))) {
+                if (!symbol.parentName)
+                    continue;
+
                 for (const result of results.values()) {
                     if (result.matches(symbol.parentName, symbol.documentSymbol.name)) {
                         const state = TestStatusCodeLens.parseOutcome(result.outcome);
@@ -70,7 +73,9 @@ export class TestStatusCodeLensProvider implements CodeLensProvider {
                                 }
                             }
                         }
-                        mapped.push(new TestStatusCodeLens(symbol.documentSymbol.selectionRange, state));
+
+                        if (state)
+                            mapped.push(new TestStatusCodeLens(symbol.documentSymbol.selectionRange, state));
                     }
                 }
             }
@@ -88,6 +93,6 @@ export class TestStatusCodeLensProvider implements CodeLensProvider {
             this.testResults.set(result.fullName, result);
         }
 
-        this.onDidChangeCodeLensesEmitter.fire(null);
+        this.onDidChangeCodeLensesEmitter.fire();
     }
 }

@@ -24,7 +24,7 @@ export class Debug {
         if (debugRunnerInfo.processId.length <= 0) {
             const match = this.processIdRegexp.exec(data);
 
-            if (match && match[1]) {
+            if (match?.[1]) {
                 debugRunnerInfo.processId = match[1];
             }
         }

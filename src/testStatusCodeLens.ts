@@ -3,7 +3,7 @@ import { CodeLens, Range } from "vscode";
 import { Utility } from "./utility";
 
 export class TestStatusCodeLens extends CodeLens {
-    public static parseOutcome(outcome: string): string {
+    public static parseOutcome(outcome: string): string | null {
         if (outcome === "Passed") {
             return Utility.codeLensPassed;
         } else if (outcome === "Failed") {
@@ -20,7 +20,7 @@ export class TestStatusCodeLens extends CodeLens {
 
         this.command = {
             title: status,
-            command: null,
+            command: "dotnet-test-explorer.openPanel",
         };
     }
 }

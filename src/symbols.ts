@@ -1,13 +1,13 @@
 import * as vscode from "vscode";
 
 export interface ITestSymbol {
-    parentName: string;
+    parentName: string | undefined;
     fullName: string;
     documentSymbol: vscode.DocumentSymbol;
 }
 
 export class Symbols {
-    public static async getSymbols(uri, removeArgumentsFromMethods?: boolean): Promise<ITestSymbol[]> {
+    public static async getSymbols(uri: vscode.Uri, removeArgumentsFromMethods?: boolean): Promise<ITestSymbol[]> {
         return vscode.commands.executeCommand<vscode.DocumentSymbol[]>("vscode.executeDocumentSymbolProvider", uri)
             .then((symbols) => {
                 if (!symbols) {

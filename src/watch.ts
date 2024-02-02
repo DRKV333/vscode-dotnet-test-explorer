@@ -24,7 +24,9 @@ export class Watch {
         const allDirectories = this.testDirectories.getTestDirectories();
 
         for (let i = 0; i < allDirectories.length; i++) {
-            this.setupWatch(allDirectories[i], this.getNamespaceForTestDirectory(allDirectories[i]), i);
+            const namespace = this.getNamespaceForTestDirectory(allDirectories[i]);
+            if (namespace)
+                this.setupWatch(allDirectories[i], namespace, i);
         }
     }
 
@@ -48,8 +50,8 @@ export class Watch {
             Logger.Log(stdout);
         }, testDirectory, true);
 
-        let startedLine = [];
-        p.stdout.on("data", async (buf) => {
+        let startedLine: string[] = [];
+        p.stdout!.on("data", async (buf) => {
             const stdout = String(buf);
 
             // The string contained in `buf` may contain less or more
@@ -88,15 +90,15 @@ export class Watch {
             }
         });
 
-        p.stdout.on("close", (buf: any) => {
+        p.stdout!.on("close", (buf: any) => {
             Logger.Log("Stopping watch");
 
             this.watchedDirectories = this.watchedDirectories.filter((wd) => wd !== testDirectory);
         });
     }
 
-    private getNamespaceForTestDirectory(testDirectory: string) {
+    private getNamespaceForTestDirectory(testDirectory: string): string | undefined {
         const firstTestForDirectory = this.testDirectories.getFirstTestForDirectory(testDirectory);
-        return firstTestForDirectory.substring(0, firstTestForDirectory.indexOf(".") - 1);
+        return firstTestForDirectory?.substring(0, firstTestForDirectory.indexOf(".") - 1);
     }
 }

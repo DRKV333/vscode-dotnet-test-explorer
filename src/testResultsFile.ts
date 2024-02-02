@@ -3,7 +3,7 @@ import * as fs from "fs";
 import { DOMParser } from "xmldom";
 import { TestResult } from "./testResult";
 
-function findChildElement(node: Element, name: string): Element {
+function findChildElement(node: Element, name: string): Element | null {
     let child = node.firstChild;
     while (child) {
         if (child.nodeName === name) {
@@ -16,30 +16,33 @@ function findChildElement(node: Element, name: string): Element {
     return null;
 }
 
-function getAttributeValue(node: Element, name: string): string {
+function getAttributeValue(node: Element, name: string): string | null {
     const attribute = node.attributes.getNamedItem(name);
     return (attribute === null) ? null : attribute.nodeValue;
 }
 
 function getTextContentForTag(parentNode: Element, tagName: string): string {
     const node = parentNode.getElementsByTagName(tagName);
-    return node.length > 0 ? node[0].textContent : "";
+    return node[0]?.textContent ?? "";
 }
 
-function parseDuration(value: string) {
-    const parts = value.split(':')
-    if (parts.length !== 3) return undefined
-    let milliseconds = 0
+function parseDuration(value: string): number | undefined {
+    const parts = value.split(':');
+    if (parts.length !== 3)
+        return undefined;
+
+    let milliseconds = 0;
+
     //hours
-    milliseconds = milliseconds + parseInt(parts[0]) * 60 * 60 * 1000
+    milliseconds = milliseconds + parseInt(parts[0]) * 60 * 60 * 1000;
 
     //minutes
-    milliseconds = milliseconds + parseInt(parts[1]) * 60 * 1000
+    milliseconds = milliseconds + parseInt(parts[1]) * 60 * 1000;
 
     //seconds
-    milliseconds = milliseconds + parseFloat(parts[2]) * 1000
+    milliseconds = milliseconds + parseFloat(parts[2]) * 1000;
 
-    return milliseconds
+    return milliseconds;
 }
 
 function parseUnitTestResults(xml: Element): TestResult[] {
@@ -47,16 +50,20 @@ function parseUnitTestResults(xml: Element): TestResult[] {
     const nodes = xml.getElementsByTagName("UnitTestResult");
 
     // TSLint wants to use for-of here, but nodes doesn't support it
-    for (let i = 0; i < nodes.length; i++) { // tslint:disable-line
+    /* tslint:disable-next-line */
+    for (let i = 0; i < nodes.length; i++) { // NOSONAR
+        const testId = getAttributeValue(nodes[i], 'testId');
+        if (!testId)
+            continue;
 
         results.push(
             new TestResult(
-                getAttributeValue(nodes[i], 'testId'),
-                getAttributeValue(nodes[i], 'outcome'),
+                testId,
+                getAttributeValue(nodes[i], 'outcome') ?? "",
                 getTextContentForTag(nodes[i], 'Message'),
                 getTextContentForTag(nodes[i], 'StackTrace'),
-                parseDuration(getAttributeValue(nodes[i], 'duration')),
-                nodes[i].toString()
+                parseDuration(getAttributeValue(nodes[i], 'duration') ?? ""),
+                nodes[i].toString() // TODO: ???
             )
         )
     }
@@ -68,16 +75,22 @@ function updateUnitTestDefinitions(xml: Element, results: TestResult[]): void {
     const nodes = xml.getElementsByTagName("UnitTest");
     const names = new Map<string, any>();
 
-    for (let i = 0; i < nodes.length; i++) { // tslint:disable-line
+    /* tslint:disable-next-line */
+    for (let i = 0; i < nodes.length; i++) { // NOSONAR
         const node = nodes[i];
+
         const id = getAttributeValue(node, "id");
+        if (!id)
+            continue;
+
         const testMethod = findChildElement(node, "TestMethod");
-        if (testMethod) {
-            names.set(id, {
-                className: getAttributeValue(testMethod, "className"),
-                method: getAttributeValue(node, "name"),
-            });
-        }
+        if (!testMethod)
+            continue;
+
+        names.set(id, {
+            className: getAttributeValue(testMethod, "className"),
+            method: getAttributeValue(node, "name"),
+        });
     }
 
     for (const result of results) {

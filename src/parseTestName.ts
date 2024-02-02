@@ -51,7 +51,6 @@ export function parseTestName(name: string): IParsedName {
         while (i < name.length) {
             if (name[i] === "\\") {
                 i += 2;
-                continue;
             } else if (name[i] === endChar) {
                 i++;
                 break;

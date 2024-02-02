@@ -35,11 +35,13 @@ export function createTestController(
             let current = controller.items.get(parts[1]);
 
             for (let x = 2; x < parts.length; x++) {
+                if (!current)
+                    return;
                 current = current.children.get(parts[x]);
             }
 
             // should be left with desired testitem as current
-            if (current && current.id) {
+            if (current?.id) {
                 vscode.commands.executeCommand("dotnet-test-explorer.gotoTest", {
                     fqn: Utility.getFqnTestName(current.id).replace("+", ".")
                 });
@@ -67,10 +69,8 @@ export function createTestController(
             const symbol = tree.isFolder ? null : await gotoTest.info(tree);
             const treeNode = controller.createTestItem(tree.fullName, tree.name, symbol?.uri);
             treeNode.range = symbol?.range;
-            if (tree.children) {
-                for (const subTree of tree.children) {
-                    treeNode.children.add(await generateItemFromNode(subTree));
-                }
+            for (const subTree of tree.children) {
+                treeNode.children.add(await generateItemFromNode(subTree));
             }
 
             return treeNode;
@@ -104,8 +104,8 @@ export function createTestController(
 
         statusBar.discovered(controller.discoveredTests.length);
 
-        function searchTestItems(item: vscode.TestItemCollection, name: string) {
-            let result = null;
+        function searchTestItems(item: vscode.TestItemCollection, name: string): vscode.TestItem | null {
+            let result: vscode.TestItem | null = null;
 
             item.forEach((child) => {
                 if (child.id === name)
@@ -139,7 +139,7 @@ export function createTestController(
                         console.log("unexpected value for outcome: " + result.outcome);
                     
                     if (result.output)
-                        run.appendOutput(result.output, item);
+                        run.appendOutput(result.output, undefined, item);
                 }
             });
         }
@@ -152,7 +152,7 @@ export function createTestController(
         controller.items.replace([]);
         const results = await testCommands.discoverTests();
 
-        controller.discoveredTests = [].concat(...results.map((r) => r.testNames));
+        controller.discoveredTests = results.flatMap((r) => r.testNames);
         await buildItems();
         statusBar.discovered(controller.discoveredTests.length);
     }
@@ -165,7 +165,7 @@ export function createTestController(
             return `FullyQualifiedName${operator}${fullyQualifiedName}`;
         }
 
-        const excludeFilters = request.exclude.map((item) => createFilterArg(item, true));
+        const excludeFilters = request.exclude?.map((item) => createFilterArg(item, true));
 
         function startChildren(item: vscode.TestItem) {
             run.started(item);

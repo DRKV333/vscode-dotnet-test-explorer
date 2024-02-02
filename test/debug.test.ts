@@ -1,5 +1,4 @@
 import * as assert from "assert";
-import * as vscode from "vscode";
 import { Debug } from "../src/debug";
 
 suite("Debug tests", () => {
@@ -57,9 +56,9 @@ suite("Debug tests", () => {
         assert.equal(results.isSettingUp, true);
         assert.equal(results.processId, "35245");
 
-        assert.equal(results.config.name, "NET TestExplorer Core Attach");
-        assert.equal(results.config.type, "coreclr");
-        assert.equal(results.config.request, "attach");
-        assert.equal(results.config.processId, "35245");
+        assert.equal(results.config?.name, "NET TestExplorer Core Attach");
+        assert.equal(results.config?.type, "coreclr");
+        assert.equal(results.config?.request, "attach");
+        assert.equal(results.config?.["processId"], "35245");
     });
 });

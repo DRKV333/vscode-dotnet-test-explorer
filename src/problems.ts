@@ -3,21 +3,27 @@ import { TestCommands } from "./testCommands";
 import { ITestResult, TestResult } from "./testResult";
 import { Utility } from "./utility";
 
+interface ProblemInfo {
+    uri: string,
+    lineNumber: number,
+    message: string
+}
+
 export class Problems {
-    public static createProblemsFromResults(results: TestResult[]) {
+    public static createProblemsFromResults(results: TestResult[]): Record<string, vscode.Diagnostic[]> {
         const resultsWithStackTrace = results
             .filter( (tr) => tr.stackTrace);
 
         if (!resultsWithStackTrace.length) {
-            return [];
+            return {};
         }
 
-        const problems = [];
+        const problems: ProblemInfo[] = [];
 
         resultsWithStackTrace.forEach((testResult) => {
             let m = Problems.regex.exec(testResult.stackTrace);
 
-            const resultsWithLinks = [];
+            const resultsWithLinks: ProblemInfo[] = [];
 
             while (m !== null) {
                 if (m.index === Problems.regex.lastIndex) {
@@ -31,7 +37,7 @@ export class Problems {
             problems.push(resultsWithLinks[resultsWithLinks.length - 1]);
         });
 
-        return problems.reduce( (groups, item) => {
+        return problems.reduce<Record<string, vscode.Diagnostic[]>>((groups, item) => {
             const val = item.uri;
             groups[val] = groups[val] || [];
             groups[val].push(new vscode.Diagnostic(new vscode.Range(item.lineNumber - 1, 0, item.lineNumber - 1, 10000), item.message));
@@ -40,12 +46,12 @@ export class Problems {
     }
 
     private static regex = /in (.*):line (.*)/gm;
-    private _diagnosticCollection: vscode.DiagnosticCollection;
+    private _diagnosticCollection?: vscode.DiagnosticCollection;
 
     constructor(testCommands: TestCommands) {
         if (Utility.getConfiguration().get<boolean>("addProblems")) {
-            testCommands.onNewTestResults(this.addTestResults, this);
             this._diagnosticCollection = vscode.languages.createDiagnosticCollection("dotnet-test-explorer");
+            testCommands.onNewTestResults(this.addTestResults, this);
         }
     }
 
@@ -56,7 +62,7 @@ export class Problems {
     }
 
     private addTestResults(results: ITestResult) {
-        this._diagnosticCollection.clear();
+        this._diagnosticCollection!.clear();
 
         const problems = Problems.createProblemsFromResults(results.testResults);
 
@@ -68,6 +74,6 @@ export class Problems {
             }
         }
 
-        this._diagnosticCollection.set(newDiagnostics);
+        this._diagnosticCollection!.set(newDiagnostics);
     }
 }

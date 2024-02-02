@@ -2,7 +2,7 @@ import * as assert from "assert";
 import { parseTestName } from "../src/parseTestName";
 
 suite("parseTestName - test names are parsed correctly", () => {
-    function testParsing(input, expected) {
+    function testParsing(input: string, expected: string[]) {
         test(`${input} -> ${expected.map((x) => `"${x}"`).join(" ")}`, () => {
             const result = parseTestName(input);
             assert.equal(result.fullName, input);

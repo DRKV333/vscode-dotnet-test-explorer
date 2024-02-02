@@ -1,5 +1,5 @@
 "use strict";
-import { ChildProcess, exec, ExecException } from "child_process";
+import { ChildProcess, exec, ExecException, ExecOptionsWithBufferEncoding } from "child_process";
 import { platform } from "os";
 import * as vscode from "vscode";
 import { Debug, IDebugRunnerInfo } from "./debug";
@@ -19,13 +19,24 @@ export class Executor {
         this.terminals[terminal].sendText(command, addNewLine);
     }
 
-    public static exec(command: string, callback: ExecCallback, cwd?: string, addToProcessList?: boolean) {
-        // DOTNET_CLI_UI_LANGUAGE does not seem to be respected when passing it as a parameter to the exec
-        // function so we set the variable here instead
-        process.env.DOTNET_CLI_UI_LANGUAGE = "en";
-        process.env.VSTEST_HOST_DEBUG = "0";
+    public static exec(command: string, callback: ExecCallback, cwd?: string, addToProcessList?: boolean): ChildProcess {
+        return this.doExec("0", command, callback, cwd, addToProcessList);
+    }
 
-        const childProcess = exec(this.handleWindowsEncoding(command), { encoding: "utf8", maxBuffer: 5120000, cwd }, callback);
+    private static doExec(debugEnvVar: string, command: string, callback: ExecCallback, cwd?: string, addToProcessList?: boolean): ChildProcess {
+        const options: ExecOptionsWithBufferEncoding = {
+            encoding: "utf8",
+            maxBuffer: 5120000,
+            env: {
+                ...process.env,
+                "DOTNET_CLI_UI_LANGUAGE": "en",
+                "VSTEST_HOST_DEBUG": debugEnvVar
+            }
+        };
+        if (cwd)
+            options.cwd = cwd;
+
+        const childProcess = exec(this.handleWindowsEncoding(command), options, callback);
 
         if (addToProcessList) {
             Logger.Log(`Process ${childProcess.pid} started`);
@@ -33,7 +44,6 @@ export class Executor {
             this.processes.push(childProcess);
 
             childProcess.on("close", (code: number) => {
-
                 const index = this.processes.map((p) => p.pid).indexOf(childProcess.pid);
                 if (index > -1) {
                     this.processes.splice(index, 1);
@@ -45,66 +55,47 @@ export class Executor {
         return childProcess;
     }
 
-    public static debug(command: string, callback: ExecCallback, cwd?: string, addToProcessList?: boolean) {
-        // DOTNET_CLI_UI_LANGUAGE does not seem to be respected when passing it as a parameter to the exec
-        // function so we set the variable here instead
-        process.env.DOTNET_CLI_UI_LANGUAGE = "en";
-        process.env.VSTEST_HOST_DEBUG = "1";
-
-        const childProcess = exec(this.handleWindowsEncoding(command), { encoding: "utf8", maxBuffer: 5120000, cwd }, callback);
-
+    public static debug(command: string, callback: ExecCallback, cwd?: string, addToProcessList?: boolean): ChildProcess | undefined {
         if (this.debugRunnerInfo && this.debugRunnerInfo.isSettingUp) {
             Logger.Log("Debugger already running");
             return;
         }
+        
+        const childProcess = Executor.doExec("1", command, callback, cwd, addToProcessList);
 
         const debug = new Debug();
 
-        if (addToProcessList) {
-            Logger.Log(`Process ${childProcess.pid} started`);
+        childProcess.stdout!.on("data", (buf) => {
+            if (this.debugRunnerInfo && this.debugRunnerInfo.isRunning) {
+                return;
+            }
 
-            this.processes.push(childProcess);
+            Logger.Log(`Waiting for debugger to attach`);
 
-            childProcess.stdout.on("data", (buf) => {
-                if (this.debugRunnerInfo && this.debugRunnerInfo.isRunning) {
-                    return;
-                }
+            const stdout = String(buf);
 
-                Logger.Log(`Waiting for debugger to attach`);
+            this.debugRunnerInfo = debug.onData(stdout);
 
-                const stdout = String(buf);
+            if (this.debugRunnerInfo.config) {
+                Logger.Log(`Debugger process found, attaching`);
 
-                this.debugRunnerInfo = debug.onData(stdout, this.debugRunnerInfo);
+                this.debugRunnerInfo.isRunning = true;
 
-                if (this.debugRunnerInfo.config) {
-                    Logger.Log(`Debugger process found, attaching`);
+                vscode.debug.startDebugging(vscode.workspace.workspaceFolders?.[0], this.debugRunnerInfo.config).then( (c) => {
+                    // When we attach to the debugger it seems to be stuck before loading the actual assembly that's running in code
+                    // This is to try to continue past this invisible break point and into the actual code the user wants to debug
+                    setTimeout(() => {
+                        vscode.commands.executeCommand("workbench.action.debug.continue");
+                    }, 1000);
+                });
+            }
+        });
 
-                    this.debugRunnerInfo.isRunning = true;
-
-                    vscode.debug.startDebugging(vscode.workspace.workspaceFolders[0], this.debugRunnerInfo.config).then( (c) => {
-                        // When we attach to the debugger it seems to be stuck before loading the actual assembly that's running in code
-                        // This is to try to continue past this invisible break point and into the actual code the user wants to debug
-                        setTimeout(() => {
-                            vscode.commands.executeCommand("workbench.action.debug.continue");
-                        }, 1000);
-                    });
-                }
-            });
-
-            childProcess.on("close", (code: number) => {
-                Logger.Log(`Debugger finished`);
-
-                this.debugRunnerInfo = null;
-
-                vscode.commands.executeCommand("workbench.view.extension.test", "workbench.view.extension.test");
-
-                const index = this.processes.map((p) => p.pid).indexOf(childProcess.pid);
-                if (index > -1) {
-                    this.processes.splice(index, 1);
-                    Logger.Log(`Process ${childProcess.pid} finished`);
-                }
-            });
-        }
+        childProcess.on("close", (code: number) => {
+            Logger.Log(`Debugger finished`);
+            this.debugRunnerInfo = null;
+            vscode.commands.executeCommand("workbench.view.extension.test", "workbench.view.extension.test");
+        });
 
         return childProcess;
     }
@@ -132,7 +123,7 @@ export class Executor {
         return Promise.all(killPromises);
     }
 
-    private static debugRunnerInfo: IDebugRunnerInfo;
+    private static debugRunnerInfo: IDebugRunnerInfo | null = null;
 
     private static terminals: { [id: string]: vscode.Terminal } = {};
 

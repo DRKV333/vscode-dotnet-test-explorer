@@ -7,7 +7,14 @@
             "es2021"
         ],
         "sourceMap": true,
-        "rootDir": "."
+        "rootDir": ".",
+        "allowJs": false,
+        "forceConsistentCasingInFileNames": true,
+        "strict": true,
+        "exactOptionalPropertyTypes": true,
+        "noFallthroughCasesInSwitch": true,
+        "noImplicitOverride": true,
+        "noPropertyAccessFromIndexSignature": true
     },
     "exclude": [
         "node_modules",

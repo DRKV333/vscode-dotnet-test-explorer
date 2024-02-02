@@ -10,7 +10,7 @@ export interface IMessage {
 }
 
 export interface IMessagesController {
-    showWarningMessage(message: IMessage);
+    showWarningMessage(message: IMessage): any;
 }
 
 export class MessagesController implements IMessagesController {
@@ -40,7 +40,7 @@ export class MessagesController implements IMessagesController {
 
     private setSuppressed(messageType: string) {
         const suppressedMessages =
-            this.globalState.get<string[]>(suppressedMessagesStateKey) || [];
+            this.globalState.get<string[]>(suppressedMessagesStateKey) ?? [];
 
         if (suppressedMessages.indexOf(messageType) === -1) {
             suppressedMessages.push(messageType);

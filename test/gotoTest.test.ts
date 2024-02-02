@@ -7,7 +7,7 @@ import { Utility } from "../src/utility";
 suite("Find test location", () => {
 
     test("No symbols", () => {
-        const symbols = [];
+        const symbols: vscode.SymbolInformation[] = [];
 
         const testNode = new TestNode("", "Test", null);
 

@@ -19,7 +19,7 @@ export class Logger {
     }
 
     public static Show(): void {
-        if (this.outputTerminals && this.outputTerminals[this.defaultOutput]) {
+        if (this.outputTerminals?.[this.defaultOutput]) {
             this.outputTerminals[this.defaultOutput].show();
         }
     }
@@ -29,7 +29,7 @@ export class Logger {
     private static outputTerminals: { [id: string]: vscode.OutputChannel } = {};
 
     private static formatError(error: any): string {
-        if (error && error.stack) {
+        if (error?.stack) {
             return error.stack;
         }
 

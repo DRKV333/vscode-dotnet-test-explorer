@@ -4,8 +4,8 @@ export interface ITestResult {
 }
 
 export class TestResult {
-    private className: string
-    private method: string
+    private className: string = "";
+    private method: string = "";
 
     public constructor(
         private _testId: string,
@@ -28,7 +28,7 @@ export class TestResult {
         return this._outcome
     }
 
-    public get duration(): number {
+    public get duration(): number | undefined {
         return this._duration
     }
 
@@ -40,7 +40,7 @@ export class TestResult {
         return this._stackTrace
     }
 
-    public get output(): string {
+    public get output(): string | undefined {
         return this._output
     }
 

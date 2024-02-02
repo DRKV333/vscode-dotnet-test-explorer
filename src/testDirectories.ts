@@ -5,18 +5,23 @@ import * as vscode from "vscode";
 import { Logger } from "./logger";
 import { Utility } from "./utility";
 
+export interface TestForDirectory {
+    dir: string,
+    name: string
+}
+
 export class TestDirectories {
-    private directories: string[];
-    private testsForDirectory: { dir: string, name: string }[];
+    private directories: string[] = [];
+    private testsForDirectory: TestForDirectory[] = [];
 
     public parseTestDirectories() {
-        if (!vscode.workspace || !vscode.workspace.workspaceFolders) {
+        if (!(vscode.workspace?.workspaceFolders)) {
             return;
         }
 
         const testDirectoryGlob = Utility.getConfiguration().get<string>("testProjectPath");
 
-        const matchingDirs = [];
+        const matchingDirs: string[] = [];
 
         vscode.workspace.workspaceFolders.forEach((folder) => {
             const globPattern = folder.uri.fsPath.replace("\\", "/") + "/" + testDirectoryGlob;
@@ -33,7 +38,7 @@ export class TestDirectories {
         this.directories = evaluateTestDirectories(matchingDirs);
     }
 
-    public addTestsForDirectory(testsForDirectory) {
+    public addTestsForDirectory(testsForDirectory: TestForDirectory[]) {
         this.testsForDirectory = this.testsForDirectory.concat(testsForDirectory);
     }
 
@@ -41,10 +46,10 @@ export class TestDirectories {
         this.testsForDirectory = [];
     }
 
-    public getFirstTestForDirectory(directory: string): string {
-        return this
-            .testsForDirectory
-            .find((t) => t.dir === directory).name;
+    public getFirstTestForDirectory(directory: string): string | undefined {
+        return this.testsForDirectory.find(
+            (t) => t.dir === directory
+        )?.name;
     }
 
     public getTestDirectories(testName?: string): string[] {

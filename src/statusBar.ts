@@ -4,7 +4,7 @@ import { TestResult } from "./testResult";
 
 export class StatusBar {
     private status: vscode.StatusBarItem;
-    private baseStatusText: string;
+    private baseStatusText: string = "";
 
     public constructor(testCommand: TestCommands) {
         this.status = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);

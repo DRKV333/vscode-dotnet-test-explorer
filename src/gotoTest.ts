@@ -9,7 +9,7 @@ export class GotoTest {
     private async doGetLocation(test: TestNode, retry: boolean): Promise<vscode.Location> {
         const attemptRetry = retry && this.firstTry;
         
-        let symbols: vscode.SymbolInformation[] = null;
+        let symbols: vscode.SymbolInformation[] | null = null;
         let startTime = -1;
         let timeout = 0;
 
@@ -24,7 +24,7 @@ export class GotoTest {
 
             if (startTime == -1) {
                 startTime = Date.now();
-                timeout = Utility.getConfiguration().get<number>("startupSymbolPollingTimeout") * 1000;
+                timeout = (Utility.getConfiguration().get<number>("startupSymbolPollingTimeout") ?? 60) * 1000;
                 if (timeout == 0)
                     break;
             }
@@ -48,7 +48,7 @@ export class GotoTest {
     public async info(test: TestNode): Promise<vscode.Location | null> {
         try {
             return await this.doGetLocation(test, true);
-        } catch (r) {
+        } catch (r: any) {
             Logger.Log(r.message);
         }
         
@@ -61,13 +61,15 @@ export class GotoTest {
 
             vscode.workspace.openTextDocument(location.uri).then((doc) => {
                 vscode.window.showTextDocument(doc).then((editor) => {
-                    const loc = location.range;
-                    const selection = new vscode.Selection(loc.start.line, loc.start.character, loc.start.line, loc.end.character);
-                    vscode.window.activeTextEditor.selection = selection;
-                    vscode.window.activeTextEditor.revealRange(selection, vscode.TextEditorRevealType.InCenter);
+                    if (vscode.window.activeTextEditor) {
+                        const loc = location.range;
+                        const selection = new vscode.Selection(loc.start.line, loc.start.character, loc.start.line, loc.end.character);
+                        vscode.window.activeTextEditor.selection = selection;
+                        vscode.window.activeTextEditor.revealRange(selection, vscode.TextEditorRevealType.InCenter);
+                    }
                 });
             });
-        } catch (r) {
+        } catch (r: any) {
             Logger.Log(r.message);
             vscode.window.showWarningMessage(r.message);
         }

@@ -31,7 +31,7 @@ export function buildTree(parsedNames: IParsedName[]): ITestTreeNode {
                 currentNode.subTrees.set(part, newTree);
                 currentNode = newTree;
             } else {
-                currentNode = currentNode.subTrees.get(part);
+                currentNode = currentNode.subTrees.get(part)!;
             }
         }
 

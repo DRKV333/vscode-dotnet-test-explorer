@@ -23,11 +23,11 @@ export class TestCommands implements Disposable {
     private onTestRunEmitter = new EventEmitter<ITestRunContext>();
     private onNewTestResultsEmitter = new EventEmitter<ITestResult>();
     private onBuildFailedEmitter = new EventEmitter<ITestRunContext>();
-    private lastRunTestContext: ITestRunContext = null;
-    private testResultsFolder: string;
+    private lastRunTestContext: ITestRunContext | null = null;
+    private testResultsFolder!: string;
     private testResultsFolderWatcher: any;
 
-    private isRunning: boolean;
+    private isRunning: boolean = false;
 
     constructor(
         private testDirectories: TestDirectories
@@ -54,19 +54,17 @@ export class TestCommands implements Disposable {
         this.setupTestResultFolder();
 
         const runSeqOrAsync = async () => {
-
             const addToDiscoveredTests = (discoverdTestResult: IDiscoverTestsResult, dir: string) => {
                 if (discoverdTestResult.testNames.length > 0) {
                     discoveredTests.push(discoverdTestResult);
                 }
             };
 
-            const discoveredTests = [];
+            const discoveredTests: IDiscoverTestsResult[] = [];
 
             try {
-
                 if (Utility.runInParallel) {
-                    await Promise.all(testDirectories.map(async (dir) => await addToDiscoveredTests(await this.discoverTestsInFolder(dir), dir)));
+                    await Promise.all(testDirectories.map(async (dir) => addToDiscoveredTests(await this.discoverTestsInFolder(dir), dir)));
                 } else {
                     for (const dir of testDirectories) {
                         addToDiscoveredTests(await this.discoverTestsInFolder(dir), dir);
@@ -154,7 +152,10 @@ export class TestCommands implements Disposable {
         }
     }
 
-    public async runTestCommand(testName: string, isSingleTest: boolean, debug?: boolean, exclusions?: string[]): Promise<any> {
+    public async runTestCommand(testName: string, isSingleTest: boolean, debug?: boolean, exclusions?: string[]): Promise<ITestResult | undefined> {
+        if (debug === undefined)
+            debug = false;
+        
         if (this.isRunning) {
             Logger.Log("Tests already running, ignore request to run tests for " + testName);
             return;
@@ -175,7 +176,7 @@ export class TestCommands implements Disposable {
 
         Logger.Log(`Test run for ${testName}`);
 
-        for (const { } of testDirectories) {
+        for (const { } of testDirectories) { // TODO: ???
             const testContext = { testName, isSingleTest };
             this.lastRunTestContext = testContext;
             this.sendRunningTest(testContext);
@@ -183,29 +184,33 @@ export class TestCommands implements Disposable {
 
         try {
             if (Utility.runInParallel) {
-                await Promise.all(testDirectories.map(async (dir, i) => this.runTestCommandForSpecificDirectory(dir, testName, isSingleTest, i, debug, exclusions)));
+                await Promise.all(testDirectories.map(async (dir, i) => this.runTestCommandForSpecificDirectory(dir, testName, isSingleTest, i, debug!, exclusions)));
             } else {
                 for (let i = 0; i < testDirectories.length; i++) {
                     await this.runTestCommandForSpecificDirectory(testDirectories[i], testName, isSingleTest, i, debug, exclusions);
                 }
             }
-            const globPromise = new Promise<string[]>((resolve, reject) =>
-                glob("*.trx",
-                    { cwd: this.testResultsFolder, absolute: true },
-                    (err, matches) => err == null ? resolve(matches) : reject()));
+
+            const globPromise = new Promise<string[]>((resolve, reject) => glob(
+                "*.trx",
+                { cwd: this.testResultsFolder, absolute: true },
+                (err, matches) => err == null ? resolve(matches) : reject(err)
+            ));
             const files = await globPromise;
+
             const allTestResults = [];
             for (const file of files) {
                 const testResults = await parseResults(file);
                 allTestResults.push(...testResults);
             }
+
             this.sendNewTestResults({ clearPreviousTestResults: testName === "", testResults: allTestResults });
             this.isRunning = false;
             return { clearPreviousTestResults: testName === "", testResults: allTestResults }
-        } catch (err) {
+        } catch (err: any) {
             Logger.Log(`Error while executing test command: ${err}`);
-            if (err.message === "Build command failed") {
 
+            if (err.message === "Build command failed") {
                 vscode
                     .window
                     .showErrorMessage("Build failed. Fix your build and try to run the test(s) again", "Re-run test(s)",)
@@ -213,9 +218,9 @@ export class TestCommands implements Disposable {
                         if (selection !== undefined) {
                             vscode.commands.executeCommand("dotnet-test-explorer.rerunLastCommand");
                         }
-                    });;
+                    });
 
-                for (const { } of testDirectories) {
+                for (const { } of testDirectories) { //TODO: ???
                     const testContext = { testName, isSingleTest };
                     this.lastRunTestContext = testContext;
                     this.sendBuildFailed(testContext);
@@ -249,7 +254,7 @@ export class TestCommands implements Disposable {
 
         return new Promise((resolve, reject) => {
             const filters: string[]  = []
-            if (testName && testName.length) {
+            if (testName?.length) {
                 if (isSingleTest) {
                     filters.push (`FullyQualifiedName=${testName.replace(/\(.*\)/g, "")}`)
                 } else {
@@ -270,7 +275,7 @@ export class TestCommands implements Disposable {
             if (options) options = ' ' + options
 
             const testResultFile = path.join(this.testResultsFolder, trxTestName);
-            let command = `dotnet test${options} --no-build --logger \"trx;LogFileName=${testResultFile}\"`;
+            let command = `dotnet test${options} --no-build --logger "trx;LogFileName=${testResultFile}"`;
 
             if (filters) {
                 const joinedFilters = filters.join('&')

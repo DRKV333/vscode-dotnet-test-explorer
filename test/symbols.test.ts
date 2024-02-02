@@ -66,5 +66,5 @@ suite("Flattend symbols", () => {
 });
 
 function GetDocumentSymbol(name: string, kind: vscode.SymbolKind): vscode.DocumentSymbol {
-    return new vscode.DocumentSymbol(name, null, kind, new vscode.Range(new vscode.Position(1, 1), new vscode.Position(1, 1)), new vscode.Range(new vscode.Position(1, 1), new vscode.Position(1, 1)));
+    return new vscode.DocumentSymbol(name, "", kind, new vscode.Range(new vscode.Position(1, 1), new vscode.Position(1, 1)), new vscode.Range(new vscode.Position(1, 1), new vscode.Position(1, 1)));
 }

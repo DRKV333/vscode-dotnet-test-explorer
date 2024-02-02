@@ -39,25 +39,27 @@ export async function activate(context: vscode.ExtensionContext) {
 
     if (Utility.useVscodeBrowser) {
         const controller = createTestController(context, testCommands, statusBar);
-        await controller.refreshHandler(null);
+        await controller.refreshHandler?.(null!);
         context.subscriptions.push(controller);
     }
 
-    let dotnetTestExplorer = null
+    let dotnetTestExplorer: DotnetTestExplorer | null = null
     if (Utility.useOriginalBrowser) {
         dotnetTestExplorer = new DotnetTestExplorer(context, testCommands, statusBar);
         vscode.window.registerTreeDataProvider("dotnetTestExplorer", dotnetTestExplorer);
     }
 
     context.subscriptions.push(vscode.workspace.onDidChangeConfiguration(async (e: vscode.ConfigurationChangeEvent) => {
-        if (!e.affectsConfiguration("dotnet-test-explorer")) { return; }
+        if (!e.affectsConfiguration("dotnet-test-explorer"))
+            return;
 
         if (e.affectsConfiguration("dotnet-test-explorer.testProjectPath")) {
             testDirectories.parseTestDirectories();
             await testCommands.discoverTests();
         }
 
-        if (Utility.useOriginalBrowser) dotnetTestExplorer._onDidChangeTreeData.fire(null);
+        if (dotnetTestExplorer)
+            dotnetTestExplorer._onDidChangeTreeData.fire(null);
 
         Utility.updateCache();
     }));
@@ -86,12 +88,14 @@ export async function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(vscode.commands.registerCommand("dotnet-test-explorer.stop", () => {
         Executor.stop();
-        if (Utility.useOriginalBrowser) dotnetTestExplorer._onDidChangeTreeData.fire(null);
+        if (dotnetTestExplorer)
+            dotnetTestExplorer._onDidChangeTreeData.fire(null);
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand("dotnet-test-explorer.refreshTestExplorer", () => {
         testDirectories.parseTestDirectories();
-        if (Utility.useOriginalBrowser) dotnetTestExplorer.refreshTestExplorer();
+        if (dotnetTestExplorer)
+            dotnetTestExplorer.refreshTestExplorer();
     }));
 
     context.subscriptions.push(vscode.commands.registerCommand("dotnet-test-explorer.runAllTests", () => {
@@ -104,7 +108,8 @@ export async function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(vscode.commands.registerTextEditorCommand("dotnet-test-explorer.runTestInContext", (editor: vscode.TextEditor) => {
         findTestInContext.find(editor.document, editor.selection.start).then((testRunContext) => {
-            testCommands.runTestByName(testRunContext.testName, testRunContext.isSingleTest);
+            if (testRunContext)
+                testCommands.runTestByName(testRunContext.testName, testRunContext.isSingleTest);
         });
     }));
 

@@ -94,7 +94,7 @@ export class Utility {
     public static resolvePath(dir: string): string {
         return path.isAbsolute(dir)
             ? dir
-            : path.resolve(vscode.workspace.rootPath, dir);
+            : path.resolve(vscode.workspace.rootPath ?? "", dir);
     }
 
     private static autoExpandTree: boolean;
@@ -109,6 +109,6 @@ export class Utility {
         const emojiVariation = "\ufe0f";
 
         const setting = configuration.get<string>(name);
-        return setting ? setting : (fallback + emojiVariation);
+        return setting ?? (fallback + emojiVariation);
     }
 }

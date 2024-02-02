@@ -13,12 +13,12 @@ export enum TestNodeIcon {
 }
 
 export class TestNode {
-    private _isUnknown: boolean;
-    private _isLoading: boolean;
-    private _icon: string;
-    private _fqn: string;
+    private _isUnknown: boolean = false;
+    private _isLoading: boolean = false;
+    private _icon: string = TestNodeIcon.TestNotRun;
+    private _fqn: string = "";
 
-    public static fromAbstractTree(parentNamespace: string, abstractTree: ITestTreeNode, testResults: TestResult[], allNodes?: TestNode[]): TestNode {
+    public static fromAbstractTree(parentNamespace: string, abstractTree: ITestTreeNode, testResults: TestResult[] | null, allNodes?: TestNode[]): TestNode {
         const children = [];
         for (const subNamespace of abstractTree.subTrees.values()) {
             children.push(TestNode.fromAbstractTree(abstractTree.fullName, subNamespace, testResults, allNodes));
@@ -32,7 +32,7 @@ export class TestNode {
         return new TestNode(parentNamespace, abstractTree.name, testResults, children);
     }
 
-    constructor(private _parentNamespace: string, private _name: string, testResults: TestResult[], private _children?: TestNode[]) {
+    constructor(private _parentNamespace: string, private _name: string, testResults: TestResult[] | null, private _children: TestNode[] = []) {
         this.setIconFromTestResult(testResults);
 
         this._fqn = Utility
@@ -58,7 +58,7 @@ export class TestNode {
     }
 
     public get isFolder(): boolean {
-        return this._children && this._children.length > 0;
+        return this._children.length > 0;
     }
 
     public get children(): TestNode[] {
@@ -93,33 +93,31 @@ export class TestNode {
         this._icon = icon;
     }
 
-    public setIconFromTestResult(testResults: TestResult[]) {
+    public setIconFromTestResult(testResults: TestResult[] | null) {
         this._isLoading = false;
         this._isUnknown = false;
 
         if (!testResults) {
             this._icon = this.isFolder ? TestNodeIcon.Namespace : TestNodeIcon.Run;
-        } else {
-            if (this.isFolder) {
-                const testsForFolder = testResults.filter((tr) => tr.fullName.startsWith(this.fullName));
+        } else if (this.isFolder) {
+            const testsForFolder = testResults.filter((tr) => tr.fullName.startsWith(this.fullName));
 
-                if (testsForFolder.some((tr) => tr.outcome === "Failed")) {
-                    this._icon = TestNodeIcon.NamespaceFailed;
-                } else if (testsForFolder.some((tr) => tr.outcome === "NotExecuted")) {
-                    this._icon = TestNodeIcon.NamespaceNotExecuted;
-                } else if (testsForFolder.some((tr) => tr.outcome === "Passed")) {
-                    this._icon = TestNodeIcon.NamespacePassed;
-                } else {
-                    this._icon = TestNodeIcon.Namespace;
-                }
+            if (testsForFolder.some((tr) => tr.outcome === "Failed")) {
+                this._icon = TestNodeIcon.NamespaceFailed;
+            } else if (testsForFolder.some((tr) => tr.outcome === "NotExecuted")) {
+                this._icon = TestNodeIcon.NamespaceNotExecuted;
+            } else if (testsForFolder.some((tr) => tr.outcome === "Passed")) {
+                this._icon = TestNodeIcon.NamespacePassed;
             } else {
-                const resultForTest = testResults.find((tr) => tr.fullName === this.fullName);
+                this._icon = TestNodeIcon.Namespace;
+            }
+        } else {
+            const resultForTest = testResults.find((tr) => tr.fullName === this.fullName);
 
-                if (resultForTest) {
-                    this._icon = "test".concat(resultForTest.outcome, ".png");
-                } else {
-                    this._icon = TestNodeIcon.TestNotRun;
-                }
+            if (resultForTest) {
+                this._icon = "test".concat(resultForTest.outcome, ".png");
+            } else {
+                this._icon = TestNodeIcon.TestNotRun;
             }
         }
     }
