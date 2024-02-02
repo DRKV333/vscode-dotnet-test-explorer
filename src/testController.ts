@@ -104,19 +104,22 @@ export function createTestController(
 
         statusBar.discovered(controller.discoveredTests.length);
 
-        function searchTestItems(item: vscode.TestItemCollection, name: string): vscode.TestItem | null {
+        function searchTestItems(item: vscode.TestItemCollection, name: string) {
+            let result = null;
+
             item.forEach((child) => {
                 if (child.id === name)
-                    return child;
+                    result = child;
             });
-            
-            item.forEach((child) => {
-                const result = searchTestItems(child.children, name);
-                if (result)
-                    return result;
-            });
-            
-            return null;
+
+            if (!result) {
+                item.forEach((child) => {
+                    if (!result)
+                        result = searchTestItems(child.children, name);
+                });
+            }
+
+            return result;
         }
 
         if (results.testResults) {
