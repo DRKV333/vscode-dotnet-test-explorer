@@ -1,6 +1,7 @@
 .vscode/**
 .vscode-test/**
-out/test/**
+out/**
+node_modules/**
 test/**
 src/**
 images/**
@@ -8,3 +9,4 @@ images/**
 .gitignore
 tsconfig.json
 vsc-extension-quickstart.md
+tslint.json

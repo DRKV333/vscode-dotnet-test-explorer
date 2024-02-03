@@ -1,4 +1,5 @@
 {
+  "main": "./out/src/extension.js",
   "name": "dotnet-test-provider-explorer",
   "displayName": ".NET Test Provider / Explorer",
   "description": "Test Provider / Explorer for .NET (MSTest, xUnit, NUnit)",
@@ -7,7 +8,7 @@
   "license": "MIT",
   "icon": "testexplorer_dark.png",
   "engines": {
-    "vscode": "^1.70.0"
+    "vscode": "^1.86.0"
   },
   "categories": [
     "Programming Languages"
@@ -32,7 +33,6 @@
     "workspaceContains:**/*.fsproj",
     "onView:dotnetTestExplorer"
   ],
-  "main": "./out/src/extension",
   "contributes": {
     "viewsWelcome": [
       {
@@ -309,7 +309,11 @@
     ]
   },
   "scripts": {
-    "vscode:prepublish": "npm run compile",
+    "package": "npm run jank-packagejson && npx vsce package && npm run unjank-packagejson",
+    "jank-packagejson": "git apply --ignore-whitespace --unidiff-zero package.publish.patch",
+    "unjank-packagejson": "git apply --ignore-whitespace --unidiff-zero -R package.publish.patch", 
+    "vscode:prepublish": "npm run compile && npm run bundle",
+    "bundle": "npx webpack-cli build -c ./webpack.config.js",
     "compile": "npx tsc -p ./",
     "watch": "npx tsc -watch -p ./",
     "test": "node ./out/test/runTest.js",
@@ -321,15 +325,18 @@
     "@types/node": "^18.17.1",
     "@types/sinon": "^17.0.1",
     "@types/vscode": "^1.86.0",
+    "@vscode/test-electron": "^2.3.9",
+    "@vscode/vsce": "^2.23.0",
     "mocha": "^10.2.0",
     "sinon": "^17.0.1",
     "tslint": "^6.1.2",
     "typescript": "^4.7.4",
-    "@vscode/test-electron": "^2.3.9"
+    "webpack": "^5.90.1",
+    "webpack-cli": "^5.1.4"
   },
   "dependencies": {
-    "glob": "^10.3.10",
-    "@xmldom/xmldom": "^0.8.10"
+    "@xmldom/xmldom": "^0.8.10",
+    "glob": "^10.3.10"
   },
   "extensionDependencies": []
 }
