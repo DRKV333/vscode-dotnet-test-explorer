@@ -1,4 +1,3 @@
-"use strict";
 import { CodeLens, Range } from "vscode";
 import { Utility } from "./utility";
 

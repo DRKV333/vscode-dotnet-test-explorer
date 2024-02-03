@@ -1,4 +1,3 @@
-"use strict";
 import { ChildProcess, exec, ExecException, ExecOptionsWithBufferEncoding } from "child_process";
 import { platform } from "os";
 import * as vscode from "vscode";

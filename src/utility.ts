@@ -1,4 +1,3 @@
-"use strict";
 import { platform, tmpdir } from "os";
 import * as path from "path";
 import * as vscode from "vscode";

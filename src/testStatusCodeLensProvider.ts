@@ -1,4 +1,3 @@
-"use strict";
 import { CancellationToken, CodeLens, CodeLensProvider, Disposable, Event, EventEmitter, SymbolKind, TextDocument } from "vscode";
 import { ITestSymbol, Symbols } from "./symbols";
 import { TestCommands } from "./testCommands";

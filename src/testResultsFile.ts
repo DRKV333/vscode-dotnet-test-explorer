@@ -1,4 +1,3 @@
-"use strict";
 import * as fs from "fs";
 import { DOMParser } from "@xmldom/xmldom";
 import { TestResult } from "./testResult";

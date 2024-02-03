@@ -1,5 +1,3 @@
-"use strict";
-
 import * as vscode from "vscode";
 import { DotnetTestExplorer } from "./dotnetTestExplorer";
 import { Executor } from "./executor";
