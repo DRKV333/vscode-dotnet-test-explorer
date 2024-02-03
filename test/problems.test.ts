@@ -9,7 +9,7 @@ suite("Problems tests", () => {
         const results = [GetTestResult("1", "Passed", "", "")];
 
         const problems = Problems.createProblemsFromResults(results);
-        assert.equal(problems[0].length, 0);
+        assert.equal(Object.keys(problems).length, 0);
     });
 
     test("One results with stacktrace", () => {
