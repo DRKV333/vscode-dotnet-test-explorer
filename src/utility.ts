@@ -4,10 +4,25 @@ import * as path from "path";
 import * as vscode from "vscode";
 
 export class Utility {
-    public static skipBuild: boolean;
-    public static runInParallel: boolean;
-    public static useOriginalBrowser: boolean;
-    public static useVscodeBrowser: boolean;
+    private static _skipBuild: boolean;
+    public static get skipBuild(): boolean {
+        return this._skipBuild;
+    } 
+
+    private static _runInParallel: boolean;
+    public static get runInParallel(): boolean {
+        return this._runInParallel;
+    }
+
+    private static _useOriginalBrowser: boolean;
+    public static get useOriginalBrowser(): boolean {
+        return this._useOriginalBrowser;
+    }
+
+    private static _useVscodeBrowser: boolean;
+    public static get useVscodeBrowser(): boolean {
+        return this._useVscodeBrowser;
+    }
 
     private static _additionalArgumentsOption: string;
     public static get additionalArgumentsOption() {
@@ -19,24 +34,29 @@ export class Utility {
         return this._additionalDiscoveryOption;
     }
 
+    private static _codeLensEnabled: boolean;
     public static get codeLensEnabled(): boolean {
-        return Utility.showCodeLens;
+        return Utility._codeLensEnabled;
     }
 
+    private static _codeLensFailed: string;
     public static get codeLensFailed(): string {
-        return Utility.failed;
+        return Utility._codeLensFailed;
     }
 
+    private static _codeLensPassed: string;
     public static get codeLensPassed(): string {
-        return Utility.passed;
+        return Utility._codeLensPassed;
     }
 
+    private static _codeLensSkipped: string;
     public static get codeLensSkipped(): string {
-        return Utility.skipped;
+        return Utility._codeLensSkipped;
     }
 
+    private static _defaultCollapsibleState: boolean;
     public static get defaultCollapsibleState(): vscode.TreeItemCollapsibleState {
-        return Utility.autoExpandTree ? vscode.TreeItemCollapsibleState.Expanded : vscode.TreeItemCollapsibleState.Collapsed;
+        return Utility._defaultCollapsibleState ? vscode.TreeItemCollapsibleState.Expanded : vscode.TreeItemCollapsibleState.Collapsed;
     }
 
     public static get pathForResultFile(): string {
@@ -77,17 +97,16 @@ export class Utility {
 
         Utility._additionalArgumentsOption = " " + Utility.getConfiguration().get<string>("testArguments", "");
         Utility._additionalDiscoveryOption = " " + Utility.getConfiguration().get<string>("discoveryArguments", "");
-        Utility.showCodeLens = configuration.get<boolean>("showCodeLens", false);
-        Utility.failed = Utility.getLensText(configuration, "codeLensFailed", "\u274c"); // Cross Mark
-        Utility.passed = Utility.getLensText(configuration, "codeLensPassed", osx ? "\u2705" : "\u2714"); // White Heavy Check Mark / Heavy Check Mark
-        Utility.skipped = Utility.getLensText(configuration, "codeLensSkipped", "\u26a0"); // Warning
-        Utility.autoExpandTree = configuration.get<boolean>("autoExpandTree", false);
-        Utility.skipBuild = Utility.additionalArgumentsOption.indexOf("--no-build") > -1;
-        Utility.runInParallel = configuration.get<boolean>("runInParallel", false);
+        Utility._codeLensEnabled = configuration.get<boolean>("showCodeLens", false);
+        Utility._codeLensFailed = Utility.getLensText(configuration, "codeLensFailed", "\u274c"); // Cross Mark
+        Utility._codeLensPassed = Utility.getLensText(configuration, "codeLensPassed", osx ? "\u2705" : "\u2714"); // White Heavy Check Mark / Heavy Check Mark
+        Utility._codeLensSkipped = Utility.getLensText(configuration, "codeLensSkipped", "\u26a0"); // Warning
+        Utility._defaultCollapsibleState = configuration.get<boolean>("autoExpandTree", false);
+        Utility._skipBuild = Utility.additionalArgumentsOption.indexOf("--no-build") > -1;
+        Utility._runInParallel = configuration.get<boolean>("runInParallel", false);
         const browser = configuration.get<string>("testBrowser", "vscode")
-        Utility.useOriginalBrowser = browser === 'original' || browser === 'both'
-        Utility.useVscodeBrowser = browser === 'vscode' || browser === 'both'
-
+        Utility._useOriginalBrowser = browser === 'original' || browser === 'both'
+        Utility._useVscodeBrowser = browser === 'vscode' || browser === 'both'
     }
 
     /**
@@ -103,12 +122,6 @@ export class Utility {
             ? dir
             : path.resolve(vscode.workspace.rootPath ?? "", dir);
     }
-
-    private static autoExpandTree: boolean;
-    private static showCodeLens: boolean;
-    private static failed: string;
-    private static passed: string;
-    private static skipped: string;
 
     private static getLensText(configuration: vscode.WorkspaceConfiguration, name: string, fallback: string): string {
         // This is an invisible character that indicates the previous character
