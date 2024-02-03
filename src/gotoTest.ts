@@ -24,7 +24,7 @@ export class GotoTest {
 
             if (startTime == -1) {
                 startTime = Date.now();
-                timeout = (Utility.getConfiguration().get<number>("startupSymbolPollingTimeout") ?? 60) * 1000;
+                timeout = Utility.getConfiguration().get<number>("startupSymbolPollingTimeout", 60) * 1000;
                 if (timeout == 0)
                     break;
             }

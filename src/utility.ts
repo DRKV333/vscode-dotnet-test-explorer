@@ -75,8 +75,8 @@ export class Utility {
         const configuration = Utility.getConfiguration();
         const osx = platform() === "darwin";
 
-        Utility._additionalArgumentsOption = " " + (Utility.getConfiguration().get<string>("testArguments") ?? "");
-        Utility._additionalDiscoveryOption = " " + (Utility.getConfiguration().get<string>("discoveryArguments") ?? "");
+        Utility._additionalArgumentsOption = " " + Utility.getConfiguration().get<string>("testArguments", "");
+        Utility._additionalDiscoveryOption = " " + Utility.getConfiguration().get<string>("discoveryArguments", "");
         Utility.showCodeLens = configuration.get<boolean>("showCodeLens", false);
         Utility.failed = Utility.getLensText(configuration, "codeLensFailed", "\u274c"); // Cross Mark
         Utility.passed = Utility.getLensText(configuration, "codeLensPassed", osx ? "\u2705" : "\u2714"); // White Heavy Check Mark / Heavy Check Mark
