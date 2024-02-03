@@ -18,7 +18,7 @@ export class FindTestInContext {
             if (symbolCandidate) {
                 return {testName: symbolCandidate.fullName, isSingleTest: false};
             }
-            
+
             return null;
         });
     }

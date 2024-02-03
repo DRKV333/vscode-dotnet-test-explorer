@@ -60,7 +60,7 @@ export class Executor {
             Logger.Log("Debugger already running");
             return;
         }
-        
+
         const childProcess = Executor.doExec("1", command, callback, cwd, addToProcessList);
 
         const debug = new Debug();

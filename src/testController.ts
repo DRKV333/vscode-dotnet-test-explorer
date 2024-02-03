@@ -65,11 +65,11 @@ export function createTestController(
         const concreteRoot = TestNode.fromAbstractTree("", tree, []);
 
         // have original tree for original explorer
-        async function generateItemFromNode(tree: TestNode): Promise<vscode.TestItem> {
-            const symbol = tree.isFolder ? null : await gotoTest.info(tree);
-            const treeNode = controller.createTestItem(tree.fullName, tree.name, symbol?.uri);
+        async function generateItemFromNode(node: TestNode): Promise<vscode.TestItem> {
+            const symbol = node.isFolder ? null : await gotoTest.info(node);
+            const treeNode = controller.createTestItem(node.fullName, node.name, symbol?.uri);
             treeNode.range = symbol?.range;
-            for (const subTree of tree.children) {
+            for (const subTree of node.children) {
                 treeNode.children.add(await generateItemFromNode(subTree));
             }
 
@@ -128,7 +128,7 @@ export function createTestController(
 
                 if (item) {
                     Logger.Log(`${item.id}: ${result.outcome}`);
-                    
+
                     if (result.outcome === "Failed")
                         run.failed(item, { message: result.message }, result.duration);
                     else if (result.outcome === "NotExecuted")
@@ -136,8 +136,8 @@ export function createTestController(
                     else if (result.outcome === "Passed")
                         run.passed(item, result.duration);
                     else
-                        console.log("unexpected value for outcome: " + result.outcome);
-                    
+                        Logger.Log("unexpected value for outcome: " + result.outcome);
+
                     if (result.output)
                         run.appendOutput(result.output, undefined, item);
                 }
@@ -175,13 +175,13 @@ export function createTestController(
         }
 
         if (request.include) {
-            //async mapping https://stackoverflow.com/questions/40140149/use-async-await-with-array-map
+            // async mapping https://stackoverflow.com/questions/40140149/use-async-await-with-array-map
             const itemPromises = request.include.map(async (item) => {
                 startChildren(item);
-                
+
                 const result = await testCommands.runTestCommand(
                     item.id,
-                    item.children.size == 0,
+                    item.children.size === 0,
                     debug,
                     excludeFilters
                 );
@@ -195,7 +195,7 @@ export function createTestController(
             controller.items.forEach((child) => {
                 startChildren(child);
             });
-            
+
             const result = await testCommands.runTestCommand("", false, debug, excludeFilters);
             if (result)
                 await addTestResults(run, result);

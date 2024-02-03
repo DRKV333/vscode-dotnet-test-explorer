@@ -137,7 +137,6 @@ export class DotnetTestExplorer implements TreeDataProvider<TestNode> {
     }
 
     private updateTreeWithNotRunTests(testRunContext: ITestRunContext) {
-
         const runningTests = this.getNodesMatchingTestRun(testRunContext);
 
         runningTests.forEach((testNode: TestNode) => {

@@ -8,7 +8,7 @@ export class GotoTest {
 
     private async doGetLocation(test: TestNode, retry: boolean): Promise<vscode.Location> {
         const attemptRetry = retry && this.firstTry;
-        
+
         let symbols: vscode.SymbolInformation[] | null = null;
         let startTime = -1;
         let timeout = 0;
@@ -22,10 +22,10 @@ export class GotoTest {
             if (symbols?.length > 0 || !attemptRetry)
                 break;
 
-            if (startTime == -1) {
+            if (startTime === -1) {
                 startTime = Date.now();
                 timeout = Utility.getConfiguration().get<number>("startupSymbolPollingTimeout", 60) * 1000;
-                if (timeout == 0)
+                if (timeout === 0)
                     break;
             }
 
@@ -39,7 +39,7 @@ export class GotoTest {
         if (attemptRetry || symbols?.length > 0)
             this.firstTry = false;
 
-        if (attemptRetry && symbols?.length == 0)
+        if (attemptRetry && symbols?.length === 0)
             throw Error("Waited for .NET test symbols, but they did not become available.");
 
         return this.findTestLocation(symbols, test).location;
@@ -51,7 +51,7 @@ export class GotoTest {
         } catch (r: any) {
             Logger.Log(r.message);
         }
-        
+
         return null;
     }
 

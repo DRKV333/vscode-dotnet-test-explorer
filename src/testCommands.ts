@@ -155,7 +155,7 @@ export class TestCommands implements Disposable {
     public async runTestCommand(testName: string, isSingleTest: boolean, debug?: boolean, exclusions?: string[]): Promise<ITestResult | undefined> {
         if (debug === undefined)
             debug = false;
-        
+
         if (this.isRunning) {
             Logger.Log("Tests already running, ignore request to run tests for " + testName);
             return;
@@ -213,7 +213,7 @@ export class TestCommands implements Disposable {
                         }
                     });
 
-                for (const { } of testDirectories) { //TODO: ???
+                for (const { } of testDirectories) { // TODO: ???
                     const testContext = { testName, isSingleTest };
                     this.lastRunTestContext = testContext;
                     this.sendBuildFailed(testContext);
@@ -251,7 +251,7 @@ export class TestCommands implements Disposable {
                 if (isSingleTest) {
                     filters.push (`FullyQualifiedName=${testName.replace(/\(.*\)/g, "")}`)
                 } else {
-                    filters.push(`FullyQualifiedName~${testName.replace(/\(.*\)/g, "")}`)                    
+                    filters.push(`FullyQualifiedName~${testName.replace(/\(.*\)/g, "")}`)
                 }
             }
             if (exclusions) filters.push(...exclusions)
@@ -275,7 +275,7 @@ export class TestCommands implements Disposable {
                 const filterArgs = `--filter "${joinedFilters}"`
                 command = `${command} ${filterArgs}`
             }
-            
+
             this.runBuildCommandForSpecificDirectory(testDirectoryPath)
                 .then(() => {
                     Logger.Log(`Executing ${command} in ${testDirectoryPath}`);

@@ -7,7 +7,7 @@ export class Utility {
     private static _skipBuild: boolean;
     public static get skipBuild(): boolean {
         return this._skipBuild;
-    } 
+    }
 
     private static _runInParallel: boolean;
     public static get runInParallel(): boolean {
@@ -129,6 +129,6 @@ export class Utility {
         const emojiVariation = "\ufe0f";
 
         const setting = configuration.get<string>(name, "");
-        return setting != "" ? setting : (fallback + emojiVariation);
+        return setting !== "" ? setting : (fallback + emojiVariation);
     }
 }

@@ -33,13 +33,13 @@ function parseDuration(value: string): number | undefined {
 
     let milliseconds = 0;
 
-    //hours
-    milliseconds = milliseconds + parseInt(parts[0]) * 60 * 60 * 1000;
+    // hours
+    milliseconds = milliseconds + parseInt(parts[0], 10) * 60 * 60 * 1000;
 
-    //minutes
-    milliseconds = milliseconds + parseInt(parts[1]) * 60 * 1000;
+    // minutes
+    milliseconds = milliseconds + parseInt(parts[1], 10) * 60 * 1000;
 
-    //seconds
+    // seconds
     milliseconds = milliseconds + parseFloat(parts[2]) * 1000;
 
     return milliseconds;
