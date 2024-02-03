@@ -1,5 +1,5 @@
 import * as fs from "fs";
-import * as glob from "glob";
+import { globIterate } from "glob";
 import * as path from "path";
 import * as vscode from "vscode";
 import { commands, Disposable, Event, EventEmitter } from "vscode";
@@ -191,15 +191,8 @@ export class TestCommands implements Disposable {
                 }
             }
 
-            const globPromise = new Promise<string[]>((resolve, reject) => glob(
-                "*.trx",
-                { cwd: this.testResultsFolder, absolute: true },
-                (err, matches) => err == null ? resolve(matches) : reject(err)
-            ));
-            const files = await globPromise;
-
             const allTestResults = [];
-            for (const file of files) {
+            for await (const file of globIterate("*.trx", { cwd: this.testResultsFolder, absolute: true })) {
                 const testResults = await parseResults(file);
                 allTestResults.push(...testResults);
             }

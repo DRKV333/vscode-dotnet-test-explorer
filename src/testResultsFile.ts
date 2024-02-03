@@ -1,6 +1,6 @@
 "use strict";
 import * as fs from "fs";
-import { DOMParser } from "xmldom";
+import { DOMParser } from "@xmldom/xmldom";
 import { TestResult } from "./testResult";
 
 function findChildElement(node: Element, name: string): Element | null {

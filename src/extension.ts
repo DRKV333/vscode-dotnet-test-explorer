@@ -31,7 +31,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
     Logger.Log("Starting extension");
 
-    testDirectories.parseTestDirectories();
+    await testDirectories.parseTestDirectories();
 
     context.subscriptions.push(problems);
     context.subscriptions.push(statusBar);
@@ -54,7 +54,7 @@ export async function activate(context: vscode.ExtensionContext) {
             return;
 
         if (e.affectsConfiguration("dotnet-test-explorer.testProjectPath")) {
-            testDirectories.parseTestDirectories();
+            await testDirectories.parseTestDirectories();
             await testCommands.discoverTests();
         }
 
@@ -92,8 +92,8 @@ export async function activate(context: vscode.ExtensionContext) {
             dotnetTestExplorer._onDidChangeTreeData.fire(null);
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand("dotnet-test-explorer.refreshTestExplorer", () => {
-        testDirectories.parseTestDirectories();
+    context.subscriptions.push(vscode.commands.registerCommand("dotnet-test-explorer.refreshTestExplorer", async () => {
+        await testDirectories.parseTestDirectories();
         if (dotnetTestExplorer)
             dotnetTestExplorer.refreshTestExplorer();
     }));

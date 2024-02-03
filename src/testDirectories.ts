@@ -1,5 +1,5 @@
 import * as fs from "fs";
-import * as glob from "glob";
+import { glob } from "glob";
 import * as path from "path";
 import * as vscode from "vscode";
 import { Logger } from "./logger";
@@ -14,7 +14,7 @@ export class TestDirectories {
     private directories: string[] = [];
     private testsForDirectory: TestForDirectory[] = [];
 
-    public parseTestDirectories() {
+    public async parseTestDirectories() {
         if (!(vscode.workspace?.workspaceFolders)) {
             return;
         }
@@ -23,19 +23,19 @@ export class TestDirectories {
 
         const matchingDirs: string[] = [];
 
-        vscode.workspace.workspaceFolders.forEach((folder) => {
-            const globPattern = folder.uri.fsPath.replace("\\", "/") + "/" + testDirectoryGlob;
+        await Promise.all(vscode.workspace.workspaceFolders.map(async (folder) => {
+            const globPattern = `${folder.uri.fsPath}/${testDirectoryGlob}`;
 
             Logger.Log(`Finding projects for pattern ${globPattern}`);
 
-            const matchingDirsForWorkspaceFolder = glob.sync(globPattern);
+            const matchingDirsForWorkspaceFolder = await glob(globPattern, { windowsPathsNoEscape: true });
 
             matchingDirs.push(...matchingDirsForWorkspaceFolder);
 
             Logger.Log(`Found ${matchingDirsForWorkspaceFolder.length} matches for pattern in folder ${folder.uri.fsPath}`);
-        });
+        }));
 
-        this.directories = evaluateTestDirectories(matchingDirs);
+        this.directories = await evaluateTestDirectories(matchingDirs);
     }
 
     public addTestsForDirectory(testsForDirectory: TestForDirectory[]) {
@@ -66,7 +66,7 @@ export class TestDirectories {
     }
 }
 
-function evaluateTestDirectories(testDirectories: string[]): string[] {
+async function evaluateTestDirectories(testDirectories: string[]): Promise<string[]> {
     const directories = [];
     const directoriesSet = new Set<string>();
 
@@ -80,7 +80,7 @@ function evaluateTestDirectories(testDirectories: string[]): string[] {
                 testProjectFullPath = path.dirname(testProjectFullPath);
             }
 
-            if (glob.sync(`${testProjectFullPath}/+(*.csproj|*.sln|*.fsproj)`).length < 1) {
+            if ((await glob(`${testProjectFullPath}/+(*.csproj|*.sln|*.fsproj)`, { windowsPathsNoEscape: true })).length < 1) {
                 Logger.LogWarning(`Skipping path ${testProjectFullPath} since it does not contain something we can build (.sln, .csproj, .fsproj)`);
             } else if (!directoriesSet.has(testProjectFullPath)) {
                 Logger.Log(`Adding directory ${testProjectFullPath}`);
