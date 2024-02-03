@@ -245,7 +245,12 @@
         "dotnet-test-explorer.testArguments": {
           "type": "string",
           "default": "",
-          "description": "Additional arguments that are added to the dotnet test command."
+          "description": "Additional arguments that are added to the dotnet test command, when running tests."
+        },
+        "dotnet-test-explorer.discoveryArguments": {
+          "type": "string",
+          "default": "",
+          "description": "Additional arguments that are added to the dotnet test command, when discovering tests."
         },
         "dotnet-test-explorer.leftClickAction": {
           "type": "string",

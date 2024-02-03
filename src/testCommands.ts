@@ -83,7 +83,7 @@ export class TestCommands implements Disposable {
     }
 
     public async discoverTestsInFolder(dir: string): Promise<IDiscoverTestsResult> {
-        const testsForDir: IDiscoverTestsResult = await discoverTests(dir, Utility.additionalArgumentsOption);
+        const testsForDir: IDiscoverTestsResult = await discoverTests(dir, Utility.additionalDiscoveryOption);
         this.testDirectories.addTestsForDirectory(testsForDir.testNames.map((tn) => ({ dir, name: tn })));
         return testsForDir;
     }

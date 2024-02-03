@@ -9,6 +9,16 @@ export class Utility {
     public static useOriginalBrowser: boolean;
     public static useVscodeBrowser: boolean;
 
+    private static _additionalArgumentsOption: string;
+    public static get additionalArgumentsOption() {
+        return this._additionalArgumentsOption;
+    }
+
+    private static _additionalDiscoveryOption: string;
+    public static get additionalDiscoveryOption() {
+        return this._additionalDiscoveryOption;
+    }
+
     public static get codeLensEnabled(): boolean {
         return Utility.showCodeLens;
     }
@@ -32,11 +42,6 @@ export class Utility {
     public static get pathForResultFile(): string {
         const pathForResultFile = Utility.getConfiguration().get<string>("pathForResultFile");
         return pathForResultFile ? this.resolvePath(pathForResultFile) : tmpdir();
-    }
-
-    public static get additionalArgumentsOption(): string {
-        const testArguments = Utility.getConfiguration().get<string>("testArguments");
-        return (testArguments && testArguments.length > 0) ? ` ${testArguments}` : "";
     }
 
     public static getConfiguration(): vscode.WorkspaceConfiguration {
@@ -70,6 +75,8 @@ export class Utility {
         const configuration = Utility.getConfiguration();
         const osx = platform() === "darwin";
 
+        Utility._additionalArgumentsOption = " " + (Utility.getConfiguration().get<string>("testArguments") ?? "");
+        Utility._additionalDiscoveryOption = " " + (Utility.getConfiguration().get<string>("discoveryArguments") ?? "");
         Utility.showCodeLens = configuration.get<boolean>("showCodeLens", false);
         Utility.failed = Utility.getLensText(configuration, "codeLensFailed", "\u274c"); // Cross Mark
         Utility.passed = Utility.getLensText(configuration, "codeLensPassed", osx ? "\u2705" : "\u2714"); // White Heavy Check Mark / Heavy Check Mark
