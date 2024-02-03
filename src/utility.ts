@@ -128,7 +128,7 @@ export class Utility {
         // should be displayed as an emoji, which in our case adds some colour
         const emojiVariation = "\ufe0f";
 
-        const setting = configuration.get<string>(name);
-        return setting ?? (fallback + emojiVariation);
+        const setting = configuration.get<string>(name, "");
+        return setting != "" ? setting : (fallback + emojiVariation);
     }
 }
