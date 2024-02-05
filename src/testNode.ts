@@ -58,7 +58,7 @@ export class TestNode {
     }
 
     public get isFolder(): boolean {
-        return this._children.length > 0;
+        return (this._parentNamespace === "" && this._name === "") || this._children.length > 0;
     }
 
     public get children(): TestNode[] {
