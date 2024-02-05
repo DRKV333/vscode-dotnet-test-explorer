@@ -73,6 +73,20 @@
             "preLaunchTask": "npm"
         },
         {
+            "name": "Launch Extension (no tests)",
+            "type": "extensionHost",
+            "request": "launch",
+            "runtimeExecutable": "${execPath}",
+            "args": [
+                "${workspaceRoot}/test/.vscode",
+                "--extensionDevelopmentPath=${workspaceRoot}" 
+            ],
+            "stopOnEntry": false,
+            "sourceMaps": true,
+            "outFiles": [ "${workspaceRoot}/out/src/**/*.js" ],
+            "preLaunchTask": "npm"
+        },
+        {
             "name": "Launch Extension (multiple tests)",
             "type": "extensionHost",
             "request": "launch",
